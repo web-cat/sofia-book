@@ -1,0 +1,136 @@
+/* This style assumes that the typefaces Source Code Pro and Source Sans Pro
+   have already been imported in a previous stylesheet. */
+
+/* Code styling */
+.cm-s-simple span.cm-meta       {color: #FF1717;}
+.cm-s-simple span.cm-keyword    {color: #00f;}
+.cm-s-simple span.cm-atom       {color: #219;}
+.cm-s-simple span.cm-number     {color: #164;}
+.cm-s-simple span.cm-def        {color: #00f;}
+.cm-s-simple span.cm-variable   {color: black;}
+.cm-s-simple span.cm-variable-2 {color: #0000C0;}
+.cm-s-simple span.cm-variable-3 {color: #0000C0;}
+.cm-s-simple span.cm-property   {color: black;}
+.cm-s-simple span.cm-operator   {color: black;}
+.cm-s-simple span.cm-comment    {color: #0b0;}
+.cm-s-simple span.cm-string     {color: #a2f;}
+.cm-s-simple span.cm-string-2   {color: #a2f;}
+.cm-s-simple span.cm-error      {color: #f30;}
+.cm-s-simple span.cm-qualifier  {color: #555;}
+.cm-s-simple span.cm-builtin    {color: #30a;}
+.cm-s-simple span.cm-bracket    {color: #cc7;}
+.cm-s-simple span.cm-tag        {color: #170;}
+.cm-s-simple span.cm-attribute  {color: #00c;}
+.cm-s-simple span.cm-link       {color: #219;}
+
+.cm-s-simple .CodeMirror-matchingbracket {
+	font-weight: bold;
+  color: black !important;
+}
+
+.cm-s-simple .CodeMirror-selected {
+  background-color: #ffff88;
+}
+
+.cm-s-simple .cm-tab {
+  border: 1px solid black;
+}
+
+.cm-s-simple .mark-popover {
+  background-color: #d9edf7;
+  padding: 1px 0;
+  border-top:    1px solid rgba(0, 0, 255, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 255, 0.2);
+}
+
+.cm-s-simple .mark-popover.start {
+  padding-left: 2px;
+  margin-left: -3px;
+  border-top:    1px solid rgba(0, 0, 255, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 255, 0.2);
+  border-left:   1px solid rgba(0, 0, 255, 0.2);
+  border-top-left-radius:    4px;
+  border-bottom-left-radius: 4px;
+}
+
+.cm-s-simple .mark-popover.end {
+  padding-right: 2px;
+  margin-right: -3px;
+  border-top:    1px solid rgba(0, 0, 255, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 255, 0.2);
+  border-right:  1px solid rgba(0, 0, 255, 0.2);
+  border-top-right-radius:    4px;
+  border-bottom-right-radius: 4px;
+}
+
+/* Editor styling */
+.CodeMirror {
+  position: relative;
+  height: auto;
+  margin: 20px 0 20px 0;
+  padding: 10px 20px 11px 10px;
+  font-size: 13px;
+  line-height: 18px;
+  background: rgba(128, 128, 128, 0.07);
+  font-family: "Source Code Pro", Menlo, Monaco, "Courier New", Courier, monospace;
+  text-shadow: rgb(255, 255, 255) 0px 1px 0px;
+  -moz-border-radius:    6px;
+  -o-border-radius:      6px;
+  -webkit-border-radius: 6px;
+  border-radius:         6px;
+  -moz-box-shadow:    inset 0 1px 2px rgba(0,0,0,0.1), inset 50px 0 0 rgba(0,0,0,0.05), 0 1px 0 #fff;
+  -o-box-shadow:      inset 0 1px 2px rgba(0,0,0,0.1), inset 50px 0 0 rgba(0,0,0,0.05), 0 1px 0 #fff;
+  -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1), inset 50px 0 0 rgba(0,0,0,0.05), 0 1px 0 #fff;
+  box-shadow:         inset 0 1px 2px rgba(0,0,0,0.1), inset 50px 0 0 rgba(0,0,0,0.05), 0 1px 0 #fff;
+  -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
+  -moz-transition:    border linear 0.2s, box-shadow linear 0.2s;
+  -ms-transition:     border linear 0.2s, box-shadow linear 0.2s;
+  -o-transition:      border linear 0.2s, box-shadow linear 0.2s;
+  transition:         border linear 0.2s, box-shadow linear 0.2s;
+}
+
+.CodeMirror-focused {
+  border-color: rgba(82, 168, 236, 0.8);
+  outline: 0;
+  outline: thin dotted \9;
+  /* IE6-9 */
+}
+
+.CodeMirror-gutters {
+  background-color: transparent;
+  border-right: none;
+  padding-right: 20px;
+}
+
+.CodeMirror-gutter-text pre {
+  color: #aaa;
+}
+
+div.CodeMirror[data-title]:after {
+  position: absolute;
+  content: attr(data-title);
+  top:  12px;
+  right: 12px;
+  padding: 2px 10px;
+  background-color: #3a87ad;
+  color: #fff;
+  font: normal 13px/18px "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.15);
+  -moz-border-radius:    3px;
+  -o-border-radius:      3px;
+  -webkit-border-radius: 3px;
+  border-radius:         3px;
+  -moz-box-shadow:    inset 0 1px 1px rgba(0,0,0,0.1), 0 1px 0 rgba(255,255,255,0.35);
+  -o-box-shadow:      inset 0 1px 1px rgba(0,0,0,0.1), 0 1px 0 rgba(255,255,255,0.35);
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.1), 0 1px 0 rgba(255,255,255,0.35);
+  box-shadow:         inset 0 1px 1px rgba(0,0,0,0.1), 0 1px 0 rgba(255,255,255,0.35);
+  -moz-transition:    opacity 0.2s ease-in-out;
+  -o-transition:      opacity 0.2s ease-in-out;
+  -webkit-transition: opacity 0.2s ease-in-out;
+  transition:         opacity 0.2s ease-in-out;
+  z-index: 9999;
+}
+
+div.CodeMirror[data-title]:hover:after {
+  opacity: 0;
+}
