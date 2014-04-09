@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Chapter 2 &ndash; Structure of an Android Application &ndash; Sofia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Tony Allevato">
+
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="codemirror/lib/codemirror.css" type="text/css"/>
+    <link rel="stylesheet" href="codemirror/theme/simple.css" type="text/css"/>
+    <link rel="stylesheet" href="css/style.css" type="text/css"/>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+  <div id="page">
+    <div id="nav-and-content">
+
+      <div id="contents">
+        <h1><a href="index.html">Sofia</a></h1>
+        <dl>
+          <dt>Introduction</dt>
+          <dd><a href="introduction.html">Philosophia Sofia</a></dd>
+
+          <dt>Chapter 1</dt>
+          <dd><a href="chapter1.html">Getting Started with Android</a></dd>
+
+          <dt>Chapter 2</dt>
+          <dd><a href="chapter2.html">Structure of an Android Application</a></dd>
+          
+          <dt>Chapter 3</dt>
+          <dd><a href="chapter3.html">Basic GUI-Driven Apps</a></dd>
+          
+          <dt>Chapter 4</dt>
+          <dd><a href="chapter4.html">Testing GUI Apps</a></dd>
+
+          <dt>Chapter 5</dt>
+          <dd><a href="chapter5.html">Advanced Graphics</a></dd>
+
+          <dt>Gallery</dt>
+          <dd><a href="gallery.html">Student Work Gallery</a></dd>
+
+          <dt>Appendix A</dt>
+          <dd><a href="http://sofia.cs.vt.edu/sofia-2114/api/reference">Sofia API</a></dd>
+
+          <dt>Appendix B</dt>
+          <dd><a href="downloads.html">Demos and Downloads</a></dd>
+        </dl>
+      </div>
+
+      <div id="page-content">
+
+        <div class="subcontents">
+        <h4>Jump to...</h4>
+        <ol>
+          <li><a href="#packages">Packages in Java</a></li>
+          <li><a href="#project-structure">Android Project File Structure</a></li>
+          <li><a href="#resources">Application Resources</a></li>
+          <li><a href="#navigation">Navigation on an Android Device</a></li>
+        </ol>
+        </div>
+
+
+        <h1>
+          <small>Chapter 2</small><br/>
+          Structure of an Android App
+        </h1>
+
+        <p>
+          The structure of an Android application is fairly rigidly defined. In order for things to work properly, you need to put keep certain files in the right places. At the end of this chapter, we also discuss how basic app and screen navigation works on Android devices.
+        </p>
+
+
+        <h2 id="packages" class="page-header">
+          Packages in Java
+        </h2>
+
+        <p>
+          <span class="label label-info">Packages</span> in Java are essentially just folders where your classes can be stored. This allows you to write code that has a well-organized structure where classes that are related can be in the same package and be named in a meaningful way that indicates their purpose.
+        </p><p>
+          You've already used packages before in Java, perhaps without realizing it, because it's almost impossible to write a meaningful application that doesn't use classes in different packages. For example, Java defines a top-level package named <code>java</code>, and inside it are packages such as <code>lang</code>, which contains core classes like <code>String</code>, and <code>util</code>, which contains collection classes like <code>ArrayList</code>. Similarly, the Android API provides a top-level <code>android</code> package that contains packages named <code>graphics</code>, <code>view</code>, <code>widget</code>, and many more.
+        </p><p>
+          If you wanted to use the <code>ArrayList</code> class in your code, you would have to refer to it using its fully-qualified name that includes its entire package path: <code class="link">java.util.ArrayList</code>. Fortunately, the Java language reduces the amount of typing that you have to do by providing the <code>import</code> statement. If you write the following:
+        </p>
+        <pre>
+  import java.util.ArrayList;
+        </pre>
+        <p>
+          then writing <code>ArrayList</code> by itself would refer to the class in the <code>java.util</code> package.
+        </p><p>
+          Another advantage of using packages in Java is that you can have multiple classes with the same name as long as they are in different packages and they will not conflict. This becomes crucial when you write code that uses a lot of third-party libraries where the probability is high that libraries would have classes with the same names.
+        </p>
+
+        <h3>How Android Uses Packages</h3>
+
+        <p>
+          Android uses packages not only to arrange the code in an application but to manage the applications themselves. The Android OS requires that every app installed on a device have a package identifier that is at least two levels deep. In other words, a package named <code>mycoolapp</code> would not be appropriate, but one named <code>mycompany.mycoolapp</code> would be acceptable. Then, the main package that contains an app's code is used to uniquely identify that application on the device, and to permit apps to communicate and share information with each other.
+        </p><p>
+          As a popular convention, most Java developers create a package structure based on a <span class="label label-info">reverse domain name</span> scheme. For example, imagine that you were a developer at a company named <strong>CoolSoftware</strong> and had a website located at <code>coolsoftware.com</code>. All of the code for your company's apps could be stored in subpackages of <code>com.coolsoftware</code>. Then, if you were developing an app named <strong>AwesomeApp</strong>, you could store all of its code in <code>com.coolsoftware.awesomeapp</code>. You could even use subpackages under that to break up the code further, perhaps by separating the model and view code into separate packages.
+        </p>
+
+
+        <h2 id="project-structure" class="page-header">
+          Android Project File Structure
+        </h2>
+
+        <p>
+          Android projects in Eclipse (or even in general, when using other development tools), have a pre-defined structure with code and resource organized into a number of folders.
+        </p>
+        <dl class="dl-horizontal">
+          <dt>src/</dt>
+          <dd><p>Contains source code that <strong>you</strong> write for your app.</p></dd>
+
+          <dt>gen/</dt>
+          <dd><p>Contains source code that is <strong>autogenerated</strong> by the Android development tools that is required for your app. Do not modify any of the source files in this folder&mdash;your changes will be overwritten the next time you build your project anyway.</p></dd>
+
+          <dt>libs/</dt>
+          <dd><p>Contains precompiled third-party libraries (JAR archives) that you want to use in your app. For example, if you were writing an app that pulls data from Twitter feeds, you would want to use a Twitter library that someone has already written for you, and you would put it in this folder.</p></dd>
+
+          <dt>res/</dt>
+          <dd><p>Contains other folders with <span class="label label-info">resources</span> for your application: GUI layouts, icons, menus, and so forth.</p></dd>
+
+          <dt>assets/</dt>
+          <dd><p>Contains other media that you might want to use in your app, such as videos, sounds, and large images that are not used directly in GUI layouts.</p></dd>
+        </dl>
+
+
+        <h2 id="resources" class="page-header">
+          Application Resources
+        </h2>
+
+        <p>
+          As briefly mentioned above, the <code>res</code> folder of your project stores a variety of resources that your application needs to present itself to the user. These resources are stored in folders inside the <code>res</code> folder, depending on the type of the resource:
+        </p>
+
+        <dl class="dl-horizontal">
+          <dt>menu/</dt>
+          <dd><p>
+            Contains XML files that describe menus that are associated with screens in your application, which the user can make appear by clicking the <strong>Menu</strong> button on his or her device.
+          </p></dd>
+
+          <dt>drawable-*dpi/</dt>
+          <dd><p>
+            Contains images used in various parts of the application: launch screen icons, images attached to buttons or menus, and so forth.
+          </p><p>
+            Android projects can actually have multiple <code>drawable</code> folders that are named after the resolution of the device. For example, <code>drawable-ldpi</code> would contain images used on low resolution devices, <code>drawable-hdpi</code> would contain images used on high resolution devices, and so forth. This allows an app developer to create images designed specifically for different sized screens that look crisp and clear without any scaling or blurring.
+          </p><p>
+            Of course, if an exact resolution match is not found, the Android OS will look for the closest match and scale it up or down to fit. For this reason, in this class we'll just stick all of our images in <code>drawable-hdpi</code> and not worry about multiple sizes.
+          </p></dd>
+
+          <dt>layout/</dt>
+          <dd><p>
+            Contains XML files that describe the layout of the widgets (buttons, text fields, and so forth) on the screens in your application. Fortunately you typically do not need to write any XML directly &ndash; the Android tools in Eclipse provide a drag-and-drop editor for laying out your screens.
+          </p></dd>
+
+          <dt>values/</dt>
+          <dd><p>
+            Contains "values" used throughout the application, such as text strings and style definitions. The main use of this is the <code>strings.xml</code> file, which can be used to store the text strings used in your GUI layouts (e.g., the labels on buttons). You don't have to do this, but if you do, it makes your application easier to translate into other languages because you have all of the strings stored conveniently in one place and you only need to have that single file translated.
+          </p></dd>
+        </dl>
+
+        <p>
+          There are other types of resources as well, but these are the ones that we will see most frequently in this class.
+        </p>
+
+
+        <h2 id="navigation" class="page-header">
+          Navigation on an Android Device
+        </h2>
+
+        <div class="figure interactive transparent pull-right">
+        <img src="img/ch2/phone.png" usemap="#phone-map"/>
+        <map name="phone-map">
+          <area shape="rect" coords="20,59,220,71" data-caption="Notification Area" title="The notification area shows your current signal and battery levels, and can be pulled down to list any app notifications that you haven't addressed yet."/>
+          <area shape="rect" coords="106,329,135,358" data-caption="Launcher" title="Clicking this icon on the home screen will bring up the grid of applications installed on your phone."/>
+          <area shape="rect" coords="106,368,135,385" data-caption="Home Button" title="Clicking the home button puts the current app in the background (but does not necessarily stop the app's execution) and returns the user to the home screen."/>
+          <area shape="rect" coords="48,368,75,385" data-caption="Back Button" title="Clicking the Back button takes the user back one level in the navigation stack. For example, if a user clicks a button on screen A to go to screen B, then pressing the Back button on screen B will return her to screen A. If a menu, dialog box, or on-scren keyboard is open, pressing Back will close it."/>
+        </map>
+        </div>
+
+        <p>
+          Navigation between apps and other features on Android phones is mostly consistent across devices, regardless of the form factor or manufacturer of that device. Google has put in place a set of suggested, and sometimes required, controls by which the user can navigate on the device.
+        </p>
+        <p>
+          The latest versions of the Android operating system require that devices have <strong>Home</strong> and <strong>Back</strong> buttons to support navigation among screens and apps. If you hover over the picture of the phone to the right, you will see portions of the interface highlighted that you can then hover over to see a description.
+        </p>
+        <p>
+          Older devices running older versions of Android had additional buttons, <strong>Menu</strong> and <strong>Search</strong>. In the latest OS, menus have been replaced by <span class="label label-info">action bars</span>, thin toolbars that were visible at all times instead of hidden until the user requested them. However, backwards compatibility allows users to still use menus in the "old" way in newer apps or to upgrade their apps to use the newer action bars. In fact, your emulator still provides a Menu button if you need to run these legacy apps.
+        </p>
+
+      </div> <!-- page-content -->
+    </div> <!-- nav-and-contents -->
+  </div> <!-- page -->
+
+  <footer>
+    <div class="container">
+      <p class="pull-left">
+        &copy; 2012&ndash;2013 Tony Allevato
+      </p>
+      <p class="pull-right">
+        <a href="#">Back to top</a>
+      </p>
+    </div>
+  </footer><!-- footer -->
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+  <script src="codemirror/lib/codemirror.js" type="text/javascript"></script>
+  <script src="codemirror/mode/clike/clike.js" type="text/javascript"></script>
+  <script src="codemirror/mode/xml/xml.js" type="text/javascript"></script>
+  <script src="codemirror/lib/util/matchbrackets.js" type="text/javascript"></script>
+  <script src="js/book.js" type="text/javascript"></script>
+
+  </body>
+</html>

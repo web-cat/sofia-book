@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Chapter 3 &ndash; Basic GUI-Driven Apps &ndash; Sofia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Tony Allevato">
+
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="codemirror/lib/codemirror.css" type="text/css"/>
+    <link rel="stylesheet" href="codemirror/theme/simple.css" type="text/css"/>
+    <link rel="stylesheet" href="css/style.css" type="text/css"/>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+  <div id="page">
+    <div id="nav-and-content">
+
+      <div id="contents">
+        <h1><a href="index.html">Sofia</a></h1>
+        <dl>
+          <dt>Introduction</dt>
+          <dd><a href="introduction.html">Philosophia Sofia</a></dd>
+
+          <dt>Chapter 1</dt>
+          <dd><a href="chapter1.html">Getting Started with Android</a></dd>
+
+          <dt>Chapter 2</dt>
+          <dd><a href="chapter2.html">Structure of an Android Application</a></dd>
+          
+          <dt>Chapter 3</dt>
+          <dd><a href="chapter3.html">Basic GUI-Driven Apps</a></dd>
+          
+          <dt>Chapter 4</dt>
+          <dd><a href="chapter4.html">Testing GUI Apps</a></dd>
+
+          <dt>Chapter 5</dt>
+          <dd><a href="chapter5.html">Advanced Graphics</a></dd>
+
+          <dt>Gallery</dt>
+          <dd><a href="gallery.html">Student Work Gallery</a></dd>
+
+          <dt>Appendix A</dt>
+          <dd><a href="http://sofia.cs.vt.edu/sofia-2114/api/reference">Sofia API</a></dd>
+
+          <dt>Appendix B</dt>
+          <dd><a href="downloads.html">Demos and Downloads</a></dd>
+        </dl>
+      </div>
+
+      <div id="page-content">
+
+        <div class="subcontents">
+        <h4>Jump to...</h4>
+        <ol>
+          <li><a href="#section-elements">Elements of an Android User Interface</a></li>
+          <li><a href="#application-components">Application Components</a></li>
+          <li><a href="#activities-and-screens">Activities and Screens</a></li>
+          <li><a href="#completed-temperature-converter">The Completed Temperature Converter</a></li>
+          <li><a href="#initializing-the-screen">Initializing the Screen</a></li>
+          <li><a href="#options-menu">Using the Options Menu</a></li>
+        </ol>
+        </div>
+
+
+        <h1><small>Chapter 3</small><br/>
+          Basic GUI-Driven Apps</h1>
+
+        <div class="page-header"><h2 id="section-elements">Elements of an Android User Interface</h2></div>
+
+        <p>Anyone who has used a modern computer or mobile device is familiar with many of the common elements that make up user interfaces: buttons, check boxes, lists, sliders, and a number of other types of controls. Each of these elements is represented by a Java class, and these classes form a rich and quite large class hierarchy.</p>
+        
+        <p>The basic building block for Android GUI elements is the <code class="link">android.view.View</code> class. All other GUI elements are subclasses of <code>View</code>. These views take up a portion of the screen and are rendered in a variety of different ways to convey information to the user, and they also respond to various kinds of user interaction, such as clicking (or tapping), dragging, keyboard input, and so forth.</p>
+
+        <p>There are two main categories of views. The first category, <span class="label label-info">widgets</span>, typically extend <code>View</code> or another subclass of <code>View</code> and are used to provide the user with an area to interact with the app, such as by clicking a button. Another category of views, called <span class="label label-info">view groups</span>, act as invisible "containers" that organize other views (or even other view groups, creating deeply nested structrues). These view groups often provide functionality to automatically lay out the views they contain &ndash; called their <span class="label label-info">children</span> &ndash; in a specific arrangement on the screen.</p>
+
+
+        <h3>Common Types of Widgets</h3>
+
+        <p>In the latest version of the Android API at the time of this writing (API level 16, "Jelly Bean"), there are <strong>78</strong> direct and indirect subclasses of <code>View</code> in the platform. Obviously we don't have room to talk about all of them! So below we're going to discuss some of the most common types of widgets that you may want to use in your apps.</p>
+
+
+        <h4>Buttons that Perform Actions</h4>
+        <p>
+          The most common type of action-based widget in the Android API is <code class="link">android.widget.Button</code>. This widget can contain a text label or an image and it will fire an event when the user clicks it. See <a href="#responding-to-events">Responding to Events</a> for a discussion of how you can handle these events to carry out actions.
+        </p>
+
+
+        <h4>Buttons that Have State</h4>
+        <p>
+          Sometimes you want a button that you can toggle on or off to indicate whether an option is enabled or disabled. Android provides a few of these:
+        </p>
+        <dl class="dl-horizontal">
+          <dt>Check boxes</dt>
+          <dd><p>Check boxes (<code class="link">android.widget.CheckBox</code>) are rendered as a button with a checkmark image and a text label describing the purpose of the button. When the user clicks a check box, it toggles its state from on to off, or from off to on.</p></dd>
+
+          <dt>Toggle buttons</dt>
+          <dd><p>Toggle buttons (<code class="link">android.widget.ToggleButton</code>) are functionally the same as check boxes, but they are rendered as a rectangular button that includes an area that "lights up" when the button is checked. Toggle buttons can also use different text labels when they are on or off.</p></dd>
+
+          <dt>Radio buttons</dt>
+          <dd><p>Radio buttons (<code class="link">android.widget.RadioButton</code>) are similar to check boxes, but with the added feature that you can create a set of them so that only one can be checked at any time. In other words, checking one of the buttons will turn off the other ones in the same group, so they can be used to represent a mutually exclusive set of options.</p>
+          <p>To indicate which radio buttons should be treated as a single set of options, you must place them inside an <code class="link">android.widget.RadioGroup</code>.</dd>
+        </dl>
+
+        <p>
+          Each of these types of buttons extends a common superclass, <code class="link">android.widget.CompoundButton</code>. Because of this, they all share common methods for accessing or modifying that state. The <code class="link">android.widget.CompoundButton#isChecked()</code> method returns <code>true</code> if the button is checked or <code>false</code> if it is not. Likewise, the <code class="link">android.widget.CompoundButton#setChecked(boolean)</code> method lets you change the state of the button from within your code.
+        </p>
+        <p>
+          Also, like regular buttons, these "stateful" buttons fire events when clicked if you need to be able to respond to that immediately with an action.
+        </p>
+
+        
+        <h4>Widgets for Text Entry</h4>
+
+        <p>
+          When you need the user of your app to be able to enter some text, the <code class="link">android.widget.EditText</code> widget exists for this purpose.
+        </p><p>
+          This one class provides a wide variety of input mechanisms for entering different kinds of textual data. It can be configured to support single-line entry or multi-line entry, and a variety of input types allow you to restrict the format of the data being entered. For example, you can create <code>EditText</code> widgets that support arbitrary text, or that support only numeric data, or telephone numbers, to list a few. For devices that have on-screen keyboards, the keyboard can reconfigure itself to display only keys that are relevant for that particular input type when a widget is selected.
+        </p><p>
+          The text currently entered in the widget can be requested by calling the <code class="link">android.widget.EditText#getText()</code> method.
+        </p>
+        <div class="alert alert-warning">
+          <strong>Be careful!</strong> The <code>getText()</code> method for <code>EditText</code> widgets does not return a <code>String</code> but rather an instance of <code class="link">android.text.Editable</code>, which represents an editable buffer (because <code>String</code> objects cannot be changed once created). In order to get the text as a string that you can use, call <code>getText().toString()</code>.
+        </div>
+        <p>
+           Likewise, calling <code class="link">android.widget.TextView#setText(CharSequence)</code> lets you change the text in the widget from within your code. (<code>CharSequence</code> is an interface that both <code>String</code> and <code>Editable</code> implement.)
+        </p>
+
+        
+        <h4>Simple Informational Widgets</h4>
+
+        <p>Sometimes you just need to put a small informational piece of text on the screen without providing any interaction with it &ndash; for example, to show the result of a computation or to label another widget to indicate its purpose. The <code class="link">android.widget.TextView</code> class is used for this.</p>
+
+
+        <div class="page-header"><h2 id="application-components">Application Components</h2></div>
+
+        <p>Android applications can be composed of four types of <span class="label label-info">application components</span>:</p>
+
+        <dl>
+          <dt>Activity</dt>
+          <dd><p>
+            A single screen that provides a user interface.
+          </p></dd>
+
+          <dt>Service</dt>
+          <dd><p>
+            A component that runs in the background to complete a long-running computation without disrupting the user.
+          </p></dd>
+
+          <dt>Content provider</dt>
+          <dd><p>
+            A component that manages shared data that can be made available to other applications.
+          </p></dd>
+
+          <dt>Broadcast receiver</dt>
+          <dd><p>
+            A component that responds to system-wide broadcast notifications, such as the battery life falling below a threshold, or the phone being locked.
+          </p></dd>
+        </dl>
+
+        <p>Each of these application components is an entry point for either the user, the operating system, or other applications to access your app. For example, activities allow the user to interact with your app, while content providers allow other apps to access data created by your app and its users.</p>
+
+
+        <div class="page-header"><h2 id="activities-and-screens">Activities and Screens</h2></div>
+
+        <img src="img/screen-inheritance.png" class="pull-right"
+          alt="Inheritance hierarchy including the Screen class."/>
+
+        <p>Most simple applications, such as those you will do in this class, will consist entirely of <span class="label label-info">activities</span> that represent the interface that the user will interact with.</p>
+
+        <p>In the Android API, all activities extend the <code class="link">android.app.Activity</code> class, which provides a common set of functionality for the GUI features of an application. Apps built using Sofia should instead extend the <code class="link">sofia.app.Screen</code> class, which is a subclass of <code>Activity</code> that includes additional behavior. (The name of the class reinforces the notion that it represents and controls a single <span class="label label-info">screen</span> of the application's user interface.)</p>
+
+
+        <h3>Creating a Screen</h3>
+
+        <p>Each screen should present the user with some sort of interface that he or she can interact with. Most applications will extend the <code>Screen</code> class (or one of the other specialized subclasses that Sofia provides) and write the functionality for that screen of their app in that class.</p>
+
+        <div class="alert alert-info">
+        When speaking about how classes and components fit into a model-view-controller design, the screen acts as the <span class="label label-info">controller</span>.
+        </div>
+
+        <p>Imagine that we are writing a very basic <span class="label label-info">temperature converter</span> app to convert between Celsius and Fahrenheit scales. We would only need one screen for this simple app, which would contain some <code>TextView</code> informational labels, some <code>EditText</code> fields to enter the temperatures, and perhaps another <code>Button</code> to reset the fields in the app.</p>
+
+        <p>The first step of creating this app is to create a new subclass of <code>Screen</code> in the application's main package, <code>cs2114.demos.temperatures</code>. Let's call this class <code>TemperatureScreen</code>. The simplest possible class that we can write is an empty one:</p>
+
+<pre data-title="TemperatureScreen.java">
+package cs2114.demos.temperatures;
+
+import sofia.app.Screen;
+
+public class TemperatureScreen extends Screen
+{
+}
+</pre>
+
+        <p>We could actually run this program right now. If we did, we would see a blank screen. This makes sense, since we haven't written anything that would put something more meaningful there. So how do we tell Android what should go on the screen? How does it know what buttons, text fields, lists, and other widgets to use?</p>
+
+
+  <div class="row-fluid">
+    <div class="span8">
+        <h3>Designing Your Screen's Layout</h3>
+
+        <p>Fortunately, using Sofia, you don't have to write a single line of code to associate a GUI with your screen class. Recall that the <code>res/layout</code> folder of your project is where you put XML layout files that describe the look of your application. Using the Android GUI editor built in to Eclipse, you can drag and drop widgets onto a layout and see a very close approximation of how your app will look. You can see one possible example for this app in the image to the right.</p>
+
+        <p>When you extend <code>Screen</code>, Sofia will <em>automatically find the layout</em> for that screen if you give it a filename that matches the name of your class, converted to all lowercase, followed by the <code>.xml</code> extension.</p>
+
+        <div class="alert alert-info">
+        Android requires that layouts &ndash; and all resources, in fact &ndash; have lowercase filenames.
+        </div>
+
+        Therefore, for our example, since our screen class is named <code>TemperatureScreen</code>, we want to create a layout file named <code>temperaturescreen.xml</code> in the project's <code>res/layout</code> folder. You can use XML directly from the example below, or you can create your own version by designing it yourself.</p>
+    </div>
+    <div class="span4 r">
+      <img src="img/temperature-converter-layout.png" class="figure" alt="The GUI for the temperature converter app in the layout editor."/>
+    </div>
+  </div>
+
+  <pre data-lang="application/xml" data-title="temperatureconverterscreen.xml">
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"</span>
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"&gt;
+
+    &lt;TextView
+        android:id="@+id/fahrenheitLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="14dp"
+        android:layout_marginTop="14dp"
+        android:text="Degrees Fahrenheit:"
+        android:textAppearance="?android:attr/textAppearanceMedium" /&gt;
+
+    &lt;EditText
+        android:id="@+id/fahrenheitField"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/fahrenheitLabel"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/fahrenheitLabel"
+        android:layout_marginRight="16dp"
+        android:ems="10"
+        android:inputType="numberDecimal|numberSigned" /&gt;
+
+    &lt;TextView
+        android:id="@+id/celsiusLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/fahrenheitField"
+        android:layout_below="@+id/fahrenheitField"
+        android:layout_marginTop="14dp"
+        android:text="Degrees Celsius:"
+        android:textAppearance="?android:attr/textAppearanceMedium" /&gt;
+
+    &lt;EditText
+        android:id="@+id/celsiusField"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/celsiusLabel"
+        android:layout_alignRight="@+id/fahrenheitField"
+        android:layout_below="@+id/celsiusLabel"
+        android:ems="10"
+        android:inputType="numberDecimal|numberSigned" /&gt;
+
+    &lt;Button
+        android:id="@+id/clear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/celsiusField"
+        android:layout_below="@+id/celsiusField"
+        android:layout_marginTop="14dp"
+        android:text="Clear Fields" /&gt;
+
+&lt;/RelativeLayout&gt;
+  </pre>
+
+        <p>The identifiers that we assign to views in a layout (using the <code>android:id</code> attribute or right-clicking the view and choosing <strong>Edit ID...</strong> from the menu) is very important, because this is how we access those views inside our code.</p>
+
+        <div class="alert alert-info">
+        When stored in the XML file, Android uses a special format for the identifiers, written like <code>@+id/fahrenheitField</code>. For the purposes of understanding the raw XML, you can ignore the <code>@+id/</code> part. The identifier of that widget is <code>fahrenheitField</code>, which is what you would type into the <strong>Edit ID...</strong> dialog in the GUI editor.
+        </div>
+
+        <p>The <code>RelativeLayout</code> at the root of the layout file is a type of view group that uses a constraints system to position views relative to other views. In the layout above, for example, the widget with the identifier <code>fahrenheitField</code> is positioned so that it is below and aligned with the left edge of the widget <code>fahrenheitLabel</code>. The remaining widgets are positioned in a similar fashion. You can see these constraints as you drag and drop widgets onto your layout, as the editor draws arrows and locks things into place.
+        </p>
+
+        <p>With this layout file in place with the correct name, we can run the app again. Sofia will find the layout automatically and display it when the screen is loaded on the device. Of course, we haven't written any code to make the app do anything when the user interacts with it, so matter how much you click the button or type text into the fields, nothing meaningful will happen. That comes next.</p>
+
+        
+        <h3>Connecting Widgets to Code</h3>
+
+        <p>There are two main ways that we can bridge the gap between the GUI layout and the Java code that we write in our app:</p>
+
+        <ol>
+          <li><p><strong>Obtain a reference to the actual Java object that represents the widget.</strong> We need to do this if we want to be able to call methods on the widget &ndash; for example, to get the text currently entered in an <code>EditText</code> or to find out if a <code>CheckBox</code> is checked.</p></li>
+          
+          <li><p><strong>Listen for events generated by the widget.</strong> When the user clicks a button, or presses Enter after typing into a text field, or selects an item from a list, or interacts with the app in a number of other ways, the Android runtime fires an <span class="label label-info">event</span>. We want to respond to those events in order to perform an action in response to that user interaction.</p></li>
+        </ol>
+
+
+        <h4>Obtaining References to Widgets</h4>
+        <p>
+          In order to access properties and information about a widget at runtime, we need to have a reference to the actual Java object that represents that widget. Sofia makes this very easy. For each widget in your layout that you want a reference to, declare a private field in your screen class whose name is exactly the same as the widget ID and whose type is compatible with the type of the widget in the layout. When your screen class is initialized, these fields will be <strong>automatically filled in</strong> with references to those widgets.
+        </p><p>
+          Consider the layout above for the temperature converter app. Of the five widgets it contains, the program would need references to the two <code>EditText</code> widgets in order to pull the value that the user typed and to update the other widget with the converted temperature.
+        </p><p>
+          To obtain references to those widgets, simply declare the following fields:
+        </p>
+        <pre data-title="TemperatureScreen.java">
+public class TemperatureScreen extends Screen
+{
+    private EditText fahrenheitField;
+    private EditText celsiusField;
+}
+        </pre>
+        <p>
+          Since these fields are automatically filled in, you can immediately make a call like <code>fahrenheitField.getText().toString()</code> elsewhere in your code to retrieve the text that was typed into the field.
+        </p>
+
+        <h4 id="responding-to-events">Responding to Events from Widgets</h4>
+        <p>
+          When the user interacts with a view or a widget in your app, that view or widget generates an <span class="label label-info">event</span>. Your app needs to contain <span class="label label-info">event handlers</span> to respond to those events. For example, when a button is clicked or when the user types something into a field, you want to have the app call a method to perform an appropriate action.
+        </p>
+        <p>
+          Remember that your screen class represents the <span class="label label-info">controller</span> in your application. This is where most of your event handling code should be located, since the controller intercepts events from views and translates them into appropriate calls on the model. (In this simple example, we don't really have a model, however. All of the state that we need is stored in the text fields.)
+        </p>
+        <p>
+          So how do we write a method to handle an event from a widget? Sofia makes this easy as well. We just have to write a <code>public void</code> method in our screen class with a very specific name and it will be automatically called when a widget generates an event. The name of this method is based on the ID of the widget and the type of event that we want to handle. There is <strong>no need</strong> to set any properties in the layout XML file or manually connect any listeners to the widgets.
+        </p>
+        <p>
+          For example, if you want to have your app do something when the button with the ID <code>clear</code> is clicked, you can write the following method:
+        </p>
+        <pre>
+public void clearClicked()
+{
+    // Do something to respond to the button click.
+}
+        </pre>
+        <p>
+          Similarly, if you want an action to occur when the user has typed something into a text field with the ID <code>fahrenheitField</code> and pressed Enter or clicked the "Done" button, you can write a method like this:
+        </p>
+        <pre>
+public void fahrenheitFieldEditingDone()
+{
+    // Do something to respond to the editing operation.
+}
+        </pre>
+        <p>
+          Sometimes you need a reference to the widget that generated the event as well. If you don't want to declare a field that will hold that reference (maybe you only need the reference inside the event handler and nowhere else), then you can also write your method to take a single parameter that has the same type as your widget. You could rewrite the two examples above like this (notice that the parameter does <strong>not</strong> have to have the same name as the widget ID):
+        </p>
+        <pre>
+public void clearClicked(Button button)
+{
+    // Do something to respond to the button click.
+}
+
+public void fahrenheitFieldEditingDone(EditText field)
+{
+    // Do something to respond to the editing operation.
+}
+        </pre>
+        <p>
+          Sofia currently supports handling the following kinds of events in this way (replace <code><em>id</em></code> with the ID of the view and <code><em>ViewType</em></code> with the type of the view):
+        </p>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Action to handle</th>
+              <th>Supported by these views/widgets</th>
+              <th>Write a method like this</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Clicking a view</td>
+              <td>Mainly <code>Button</code>s, but any subclass of <code>View</code> that is not also a subclass of <code>AdapterView</code> and where <code>isClickable()</code> returns <code>true</code></td>
+              <td class="nowrap">
+                <code>public void <em>id</em>Clicked()</code> or<br/>
+                <code>public void <em>id</em>Clicked(<em>ViewType</em> widget)</code><br/>
+              </td>
+            </tr>
+            <tr>
+              <td>Completing an edit in a text field</td>
+              <td><code>EditText</code></td>
+              <td class="nowrap">
+                <code>public void <em>id</em>EditingDone()</code> or<br/>
+                <code>public void <em>id</em>EditingDone(EditText widget)</code><br/>
+              </td>
+            </tr>
+            <tr>
+              <td>Clicking an item in a list</td>
+              <td><code>ListView</code></td>
+              <td class="nowrap">
+                <code>public void <em>id</em>ItemClicked(Object item)</code> or<br/>
+                <code>public void <em>id</em>ItemClicked(Object item, int position)</code><br/>
+              </td>
+            </tr>
+            <tr>
+              <td>Selecting an item in a spinner</td>
+              <td><code>Spinner</code></td>
+              <td class="nowrap">
+                <code>public void <em>id</em>ItemSelected(Object item)</code> or<br/>
+                <code>public void <em>id</em>ItemSelected(Object item, int position)</code><br/>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          Let's use this feature to write a method that will be called when the use enters a temperature in the Fahrenheit field:
+        </p>
+        <pre>
+public void fahrenheitFieldEditingDone()
+{
+    double degreesF =
+        Double.parseDouble(fahrenheitField.getText().toString());
+    double degreesC = (degreesF - 32) * 5 / 9;
+    celsiusField.setText(Double.toString(degreesC));
+}
+        </pre>
+        <p>
+          In the method above, we ask the <code>fahrenheitField</code> for its current text value and convert it to a floating-point value. Then we convert it to degrees Celsius and finally update the text value of <code>celsiusField</code> to contain the converted value.
+        </p><p>
+          Doing the same for the Celsius field is almost identical:
+        </p>
+        <pre>
+public void celsiusFieldEditingDone()
+{
+    double degreesC =
+        Double.parseDouble(celsiusField.getText().toString());
+    double degreesF = degreesC * 9 / 5 + 32;
+    fahrenheitField.setText(Double.toString(degreesF));
+}
+        </pre>
+        <p>
+          If we want to clear the fields when that button is clicked (maybe you want the temperatures you're converting to be secret!), then handling the <code>clear</code> button's click event is as easy as writing another method:
+        </p>
+        <pre>
+public void clearClicked()
+{
+    celsiusField.setText("");
+    fahrenheitField.setText("");
+}
+        </pre>
+
+
+        <div class="page-header"><h2 id="completed-temperature-converter">The Completed Temperature Converter</h2></div>
+
+        <p>
+          For quick reference, here is the entire Java source for the <code>TemperatureScreen</code> class. If you combine this with the layout XML file above, you will have your first completely functional Android/Sofia app!
+        </p>
+
+        <pre data-title="TemperatureScreen.java">
+package cs2114.demos.temperatures;
+
+import sofia.app.*;
+import android.widget.EditText;
+
+public class TemperatureScreen extends Screen
+{
+    private EditText fahrenheitField;
+    private EditText celsiusField;
+
+
+    /**
+     * This method is called when the user presses Enter in the
+     * "fahrenheitField" widget.
+     */
+    public void fahrenheitFieldEditingDone()
+    {
+        double degreesF =
+            Double.parseDouble(fahrenheitField.getText().toString());
+        double degreesC = (degreesF - 32) * 5 / 9;
+        celsiusField.setText(Double.toString(degreesC));
+    }
+
+
+    /**
+     * This method is called when the user presses Enter in the
+     * "celsiusField" widget.
+     */
+    public void celsiusFieldEditingDone()
+    {
+        double degreesC =
+            Double.parseDouble(celsiusField.getText().toString());
+        double degreesF = degreesC * 9 / 5 + 32;
+        fahrenheitField.setText(Double.toString(degreesF));
+    }
+
+
+    /**
+     * This method is called when the user clicks the "clear" button.
+     */
+    public void clearClicked()
+    {
+        celsiusField.setText("");
+        fahrenheitField.setText("");
+    }
+}
+        </pre>
+
+        <div class="page-header"><h2 id="initiaizing-the-screen">Initializing the Screen</h2></div>
+        <p>
+          As you know from doing a good bit of Java programming already, most objects are initialized by <strong>constructors</strong>: special methods that are called when new objects are created so that the fields in those objects can be set to hold starting values.
+        </p>
+        <p>
+          For activities and screens, however, we do <strong>not</strong> initialize them inside their constructors. There are a couple reasons for this:
+        </p>
+        <ul>
+          <li><p>The Java object is created before the screen has been integrated into the rest of the application's context. When the screen's constructor is called, it hasn't been linked up with other resources or widgets yet.</p></li>
+          <li><p>Since memory is limited on mobile devices, activities can be disposed when they're not being used in order to free up resources. This might leave the same <code>Screen</code> object in memory but re-initialize it multiple times to restore its layout once it's brought back into view.</p></li>
+        </ul>
+        <p>
+          Therefore, instead of writing constructors for classes that subclass <code>Screen</code>, you should write a <code>public void</code> method named <code>initialize()</code> instead. This method will be called whenever the screen is about to be presented to the user for the first time, or when it is about to appear again after it has been off screen long enough that it has been removed from memory. By the time <code>initialize()</code> is called, your screen's layout has been inflated and any widget references are automatically filled in so that you can refer to them to prepare the initial state of your application.
+        </p>
+        <pre>
+public class TemperatureScreen extends Screen
+{
+    public void initialize()
+    {
+        // Do initialization here, not in the constructor.
+    }
+}
+        </pre>
+        <div class="alert alert-info">
+          The default form of the <code>initialize()</code> method takes no parameters. There are situations that will be discussed later where you may want to write other versions of this method that take different parameters.
+        </div>
+
+
+        <div class="page-header"><h2 id="options-menu">Using the Options Menu</h2></div>
+
+        <p>
+          In versions of Android up to 2.3, applications can have an <span class="label label-info">options menu</span> that is hidden until the user presses the Menu key on his or her device. The options menu can be used to hold actions or settings that you want the user to be able to access quickly but that are not important enough to occupy screen space at all times.
+        </p><p>
+          Starting with Android 3.0, Google extended the notion of the options menu into an <span class="label label-info">action bar</span>. The action bar is a thin toolbar at the top or bottom of the screen and menu items can be optionally placed there instead of in a hidden menu.
+        </p><p>
+          Menus are defined using XML files that you store in the <code>res/menu</code> folder of your project. An example of this file is shown below.
+        </p>
+        <pre data-lang="application/xml">
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;menu xmlns:android="http://schemas.android.com/apk/res/android"&gt;
+    &lt;item android:id="@+id/red" android:title="Red" android:icon="@+drawable/menu_red"/&gt;
+    &lt;item android:id="@+id/green" android:title="Green" android:icon="@+drawable/menu_green"/&gt;
+    &lt;item android:id="@+id/blue" android:title="Blue" android:icon="@+drawable/menu_blue"/&gt;
+    &lt;item android:id="@+id/clear" android:title="Clear" android:icon="@+drawable/menu_clear"/&gt;
+&lt;/menu&gt;
+        </pre>
+        <p>
+          Fortunately, as with GUI layout files, the Android plug-ins for Eclipse provide a more convenient user interface to edit these resources.
+        </p>
+
+        
+        <h3>Attaching a Menu to a Screen</h3>
+        <p>
+           By default, when you extend <code>Screen</code> (or one of its subclasses), there will be no menu associated with that screen &ndash; pressing the Menu button on your device will do nothing. The easiest way to associate a menu with a screen is to do the following two tasks:
+        </p>
+        <ol>
+          <li><p>Create a menu resource in <code>res/menu</code> that is named with the lowercased name of your screen class (similar to creating layouts). For example, the <code>TemperatureScreen</code> class would store its menu in <code>res/menu/temperaturescreen.xml</code>.</p></li>
+          <li><p>Add the <code>@OptionsMenu</code> annotation to the top of your screen class:</p></li>
+        </ol>
+        <pre>
+@OptionsMenu
+public class TemperatureScreen extends Screen
+        </pre>
+        <p>
+          Then, pressing the Menu button will make the menu appear on the screen. Note that <strong>both steps</strong> are required to make the menu work. Unlike a screen layout, just putting the properly named file in the resource directory is not enough.
+        </p>
+        <p>
+          If you want to use a menu resource with a name different than that of the <code>Screen</code>, then you can pass the name of the resource to the annotation:
+        </p>
+        <pre>
+@OptionsMenu("my_menu")  // loads res/menu/my_menu.xml
+public class TemperatureScreen extends Screen
+        </pre>
+
+        
+        <h3>Responding to Menu Events</h3>
+        <p>
+          Menus generate events when an item in the menu is clicked. In fact, menu items generate the same <code>Clicked</code> events that buttons and similar widgets do. So, if you have a menu item with the ID <code>clear</code>, the following method would be called when it is clicked:
+        </p>
+        <pre>
+public void clearClicked()
+{
+    // Called when either a button or menu item with the ID
+    // "clear" is clicked
+}
+        </pre>
+        <p>
+          The advantage of this is that if a screen has a button with a particular ID and a menu item with the same ID, selecting either one will invoke the same action. (However, you probably wouldn't want to design a GUI that has the same action in two places!) If you find that you absolutely must distinguish between these two events, you can overload the method with a parameter that indicates the source of the event:
+        </p>
+        <pre>
+public void clearClicked(Button button)
+{
+    // Called when a button with the ID "clear" is clicked
+}
+
+public void clearClicked(MenuItem menuItem)
+{
+    // Called when a menu item with the ID "clear" is clicked
+}
+        </pre>
+
+      </div> <!-- page-content -->
+    </div> <!-- nav-and-contents -->
+  </div> <!-- page -->
+
+  <footer>
+    <div class="container">
+      <p class="pull-left">
+        &copy; 2012&ndash;2013 Tony Allevato
+      </p>
+      <p class="pull-right">
+        <a href="#">Back to top</a>
+      </p>
+    </div>
+  </footer><!-- footer -->
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+  <script src="codemirror/lib/codemirror.js" type="text/javascript"></script>
+  <script src="codemirror/mode/clike/clike.js" type="text/javascript"></script>
+  <script src="codemirror/mode/xml/xml.js" type="text/javascript"></script>
+  <script src="codemirror/lib/util/matchbrackets.js" type="text/javascript"></script>
+  <script src="js/book.js" type="text/javascript"></script>
+
+  </body>
+</html>

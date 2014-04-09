@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Chapter 1 &ndash; Getting Started with Android &ndash; Sofia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Tony Allevato">
+
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="codemirror/lib/codemirror.css" type="text/css"/>
+    <link rel="stylesheet" href="codemirror/theme/simple.css" type="text/css"/>
+    <link rel="stylesheet" href="css/style.css" type="text/css"/>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+  <div id="page">
+    <div id="nav-and-content">
+
+      <div id="contents">
+        <h1><a href="index.html">Sofia</a></h1>
+        <dl>
+          <dt>Introduction</dt>
+          <dd><a href="introduction.html">Philosophia Sofia</a></dd>
+
+          <dt>Chapter 1</dt>
+          <dd><a href="chapter1.html">Getting Started with Android</a></dd>
+
+          <dt>Chapter 2</dt>
+          <dd><a href="chapter2.html">Structure of an Android Application</a></dd>
+          
+          <dt>Chapter 3</dt>
+          <dd><a href="chapter3.html">Basic GUI-Driven Apps</a></dd>
+          
+          <dt>Chapter 4</dt>
+          <dd><a href="chapter4.html">Testing GUI Apps</a></dd>
+
+          <dt>Chapter 5</dt>
+          <dd><a href="chapter5.html">Advanced Graphics</a></dd>
+
+          <dt>Gallery</dt>
+          <dd><a href="gallery.html">Student Work Gallery</a></dd>
+
+          <dt>Appendix A</dt>
+          <dd><a href="http://sofia.cs.vt.edu/sofia-2114/api/reference">Sofia API</a></dd>
+
+          <dt>Appendix B</dt>
+          <dd><a href="downloads.html">Demos and Downloads</a></dd>
+        </dl>
+      </div>
+
+      <div id="page-content">
+
+        <div class="subcontents">
+        <h4>Jump to...</h4>
+        <ol>
+          <li><a href="#downloading">Downloading the Android Development Tools</a></li>
+          <li><a href="#configuring-eclipse">Configuring Eclipse</a></li>
+          <li><a href="#eclipse-in-brief">Eclipse in Brief</a></li>
+          <li><a href="#create-avd">Creating a Virtual Device</a></li>
+          <li><a href="#finishing-up">Finishing Up</a></li>
+          <li><a href="#using-your-own-phone">Using Your Own Phone or Tablet</a></li>
+        </ol>
+        </div>
+
+        <h1>
+          <small>Chapter 1</small><br/>
+          Getting Started with Android
+        </h1>
+
+        <p>
+          In this class you will be using the <strong>Eclipse</strong> development environment to write your Java and Android applications. Google makes a bundle available for download that includes the Android development kit (libraries, a device emulator, and other tools) as well as the Eclipse IDE packaged together.
+        </p>
+
+        <div class="alert alert-info">
+          <strong>These instructions have changed significantly</strong> from previous offerings of the class. If you have another version of Eclipse installed, you should still follow the installation instructions here. (If you're using Eclipse for other classes or personal projects, you don't need to delete it; you can have multiple copies of it installed side-by-side.)
+        </div>
+
+        <h2 class="page-header" id="downloading">
+          Downloading the Android Development Tools
+        </h2>
+
+        <ol>
+          <li><p>
+            Click the green button below to go to Google's download page for the Android development tools (the link will open in a new tab). On the page that appears, click the blue <strong>Download the SDK</strong> button.
+          </p>
+          <p>
+            <a href="http://developer.android.com/sdk" target="_blank" class="btn btn-large btn-success btn-block">Get the Android SDK</a>
+          </p>
+          </li>
+
+          <li><p>
+            Once the download completes, extract that ZIP file somewhere appropriate on your hard drive (such as inside your user account folder). The extracted folder should contain two folders inside it named <strong>eclipse</strong> and <strong>sdk</strong>. <strong>Do not separate these two folders.</strong>
+          </p></li>
+
+        </ol>
+
+
+        <h2 class="page-header" id="configuring-eclipse">
+          Configuring Eclipse
+        </h2>
+
+        <ol>
+          <li><p>
+            Go into the <strong>eclipse</strong> folder that you extracted and open Eclipse. After a few seconds, it will ask you where you would like to set up your workspace. Your workspace contains any projects that you create, as well as your Eclipse settings and preferences. You can either use the default recommendation or place it elsewhere on your file system. Check <strong>Use this as the default and do not ask again</strong> so that Eclipse will not ask you every time you start it, and click <strong>OK</strong>.
+          </p></li>
+
+          <li><p>
+            When Eclipse is done loading, you will see the Welcome page. Close it to reveal the full development environment.
+          </p></li>
+
+          <li><p>
+            Now we need to install some additional plug-ins to make some common tasks in this course easier. Open the <strong>Help</strong> menu and select <strong>Install New Software...</strong>.
+          </p></li>
+
+          <li><p>
+            In the <strong>Work with:</strong> field, paste the following URL and press Enter:
+          </p><dl class="dl-horizontal">
+            <dt>Work with:</dt>
+            <dd><code>http://web-cat.cs.vt.edu/eclipse4</code></dd>
+          </dl></li>
+
+          <li><p>
+            <span class="label label-important">This is VERY IMPORTANT:</span> <strong>Uncheck</strong> the following two boxes at the bottom of the wizard: <strong>"Group items by category"</strong> and <strong>"Contact all update sites during install to find required software"</strong>. If you forget to uncheck the second box, one of the plug-ins that you install will really screw up your Eclipse layout and make it difficult to use.
+          </p></li>
+
+          <li><p>
+            Click the <strong>Select All</strong> button to get all of the plug-ins used in this class, and click <strong>Next</strong>. Review your selection and click <strong>Next</strong> again.
+          </p></li>
+
+          <li><p>
+            Check <strong>"I accept the terms of the license agreements"</strong> and then click <strong>Finish</strong>.
+          </p></li>
+
+          <li><p>
+            Wait while the plug-ins are downloaded and installed; this may take a few minutes. You may get a warning about installing unsigned code during the installation. Click <strong>OK</strong> to continue the installation.
+          </p></li>
+
+          <li><p>
+            When the installation is complete, Eclipse will notify you that it should be restarted in order for the changes to take effect. Click <strong>Yes</strong> to do so.
+          </p></li>
+
+          <li><p>
+            Before you can begin working on class assignments, you need to configure a couple settings in Eclipse's preferences. Once Eclipse has restarted, select <strong>"Window &gt; Preferences..."</strong> (or on Mac OS X, <strong>"ADT &gt; Preferences..."</strong>) from the menu.
+          </p></li>
+
+          <li><p>
+            Click <strong>"Configured Assignments"</strong> from the left panel and copy and paste the following two URLs into the panel. (If the line gets wrapped, make sure you don't accidentally put any spaces in it.)
+          </p>
+          <dl class="dl-horizontal">
+            <dt>Download URL</dt>
+            <dd><code>http://people.cs.vt.edu/allevato/cs2114/assignments.xml</code></dd>
+            <dt>Submit URL</dt>
+            <dd><code>https://web-cat.cs.vt.edu/Web-CAT/WebObjects/Web-CAT.woa/wa/assignments/eclipse?institution=VT</code></dd>
+          </dl></li>
+
+          <li><p>
+            Click <strong>OK</strong> to save your changes and exit the preferences window.
+          </p></li>
+
+        </ol>
+
+        
+        <h2 id="eclipse-in-brief" class="page-header">
+          Eclipse in Brief
+        </h2>
+
+        <p>
+          If this is your first time using Eclipse, the large number of toolbar buttons and docked views can be intimidating. Fortunately, there are only a few features that you'll really need and you can ignore the rest. The main toolbar has a few buttons that you'll use frequently:
+        </p>
+
+        <dl class="dl-horizontal">
+          <dt><img src="img/ch1/tb-sdk-manager.png"/></dt>
+          <dd><p>Opens the <strong>Android SDK Manager</strong>, where you can download other versions of the Android API (for example, to support the precise version on your personal phone)</p></dd>
+
+          <dt><img src="img/ch1/tb-avd-manager.png"/></dt>
+          <dd><p>Opens the Android <strong>Android Virtual Device (AVD) Manager</strong>, where you can create and configure the virtual devices used by the Android emulator</p></dd>
+
+          <dt><img src="img/ch1/tb-project-download.png"/></dt>
+          <dd><p>Opens the <strong>Download Assignment</strong> wizard, where you can download starter projects for the assignments in the class, as well as small example apps that demonstrate Android and Sofia concepts</p></dd>
+
+          <dt><img src="img/ch1/tb-project-upload.png"/></dt>
+          <dd><p>Opens the <strong>Submit Assignment</strong> wizard, where you can submit your work on an assignment to Web-CAT for grading</p></dd>
+        </dl>
+
+
+        <h2 id="create-avd" class="page-header">
+          Creating a Virtual Device
+        </h2>
+
+        <p>
+          You can develop Android applications even if you don't have access to an actual phone or tablet. The Android SDK provides an <strong>emulator</strong> that lets you run the Android operating system and your applications on your computer. To do this, you must set up a <strong>virtual device</strong> that represents the phone or tablet that you want to emulate. Follow the steps below.
+        </p>
+
+        <ol>
+          <li><p>
+            Click the <img src="img/ch1/tb-avd-manager.png"/> button in the Eclipse toolbar to open the AVD manager.
+          </p></li>
+
+          <li><p>
+            Make sure that the <strong>Android Virtual Devices</strong> tab is selected and click the <strong>New...</strong> button.
+          </p></li>
+
+          <li><p>
+            Fill in the dialog as described below:
+          </p><dl class="dl-horizontal">
+            <dt>AVD Name</dt>
+            <dd>Pick a name that you want to use to refer to the device. You can have multiple ones, so this distinguishes among them.</dd>
+
+            <dt>Device</dt>
+            <dd>This list contains a number of device "templates" that describe the capabilities of the device you're creating. For this class, I would go with either the <strong>Nexus One</strong> or <strong>Nexus S</strong> definition, since it's a reasonably up-to-date phone profile that should fit on most laptop screens.</dd>
+
+            <dt>Target</dt>
+            <dd>Choose the version of the Android operating system that you want to target. The bundle comes with <strong>Android 4.2 - API Level 17</strong> by default, so we'll use that one.</dd>
+
+            <dt>Keyboard</dt>
+            <dd>Make sure that <strong>Hardware keyboard present</strong> is checked so that you can type in the emulator using your laptop's keyboard, and check <strong>Display a skin with hardware controls</strong> as well so that you have easy access to the standard Android home/menu/back buttons.</dd>
+
+            <dt>Emulation Options</dt>
+            <dd>Check the <strong>Snapshot</strong> button. This sets up your emulator so that if you shut it down, it will resume right where you left it the next time you start it up. Since the emulator can take a fair amount of time to start, you definitely want this.</dd>
+          </dl>
+
+          <li><p>
+            You can leave the other options set to their defaults. To create the device, click <strong>OK</strong>.
+          </p></li>
+
+          <li><p>
+            To save time later on, go ahead and select the device you just created in the list and click the <strong>Start...</strong> button. Make sure that <strong>Launch from snapshot</strong> and <strong>Save to snapshot</strong> are both checked, then click the <strong>Launch</strong> button.
+          </p><p>
+            The emulator window will appear on the screen and you will see the device boot up. Be patient &ndash; a full boot may take several moments, especially on slower computers. Once the Android home screen appears, you may want to familiarize yourself with the available features and applications. Once you're done, close the emulator. The next time you start it, it will unfreeze the snapshot and you won't have such a long wait. (Closing the emulator may also take a moment; do not worry if it appears to hang.)
+          </p><p>
+            Was the emulator window too big to fit the entire phone screen on your computer monitor? If so, you can adjust the scaling factor by closing the emulator and then starting it again, but this time check the "Scale display to real size" button and then play around with the "Screen Size (in)" value to get a scaling factor that would make it fit. Don't make it so small that you can't interact with it, though!
+          </p></li>
+        </ol>
+
+
+        <h2 id="finishing-up" class="page-header">
+          Finishing Up
+        </h2>
+
+        <p>
+          Before you dive in and start coding, you'll probably want to bring up a couple useful views in Eclipse that you'll use frequently.
+        </p><p>
+          Go to the <strong>Window &gt; Show View &gt; Other...</strong> menu and choose <strong>Android / LogCat</strong> and click <strong>OK</strong>. The LogCat view lists diagnostic messages that are logged by the Android emulator or device. Most of the messages will be things that you can ignore, but if your program crashes or throws an unhanded exception, the exception message and stack trace will appear in the LogCat view (in red, with the <code>AndroidRuntime</code> tag).
+        </p><p>
+          Then, go to the <strong>Window &gt; Show View &gt; Other...</strong> menu again and choose <strong>General / Properties</strong> and click <strong>OK</strong>. This view lists properties of whatever item is currently selected in another Eclipse view or editor; you may find it useful later on when you're designing GUIs for your assignments to edit the properties of the widgets you drop on the canvas.
+        </p>
+
+
+        <h2 id="using-your-own-phone" class="page-header">
+          Using Your Own Phone or Tablet
+        </h2>
+
+        <p>
+          If you have your own Android phone (or other device) that you want to use for development, you'll be much better off using it in class instead of wrestling with the slow emulator. The steps below will help you get it configured properly.
+        </p>
+
+        <div class="alert alert-info">
+          These instructions should be accurate for most phone and tablet models. If any of the menus or options described here are not found on yours, then you will need to seek out some documentation for your particular model or Android version.
+        </div>
+
+        <h3>Enabling USB Debugging on Your Phone</h3>
+
+        <p>
+          In order for Eclipse and the Android SDK to use your phone as a testing device, you need to enable <strong>USB Debugging</strong> on the phone. Here's how.
+        </p>
+
+        <ol>
+          <li><p>
+            If your phone is connected to your computer via the USB cable, <strong>disconnect it first.</strong>
+          </p></li>
+
+          <li><p>
+            Go to your phone's <strong>"Settings"</strong> application. Depending on your particular phone, you might find this on the same screen as your other apps, or you might be able to access it by pressing the Menu button while on the home screen.
+          </p></li>
+
+          <li><p>
+            Tap on <strong>"Applications"</strong>.
+          </p></li>
+
+          <li><p>
+            If it is not already checked, tap the option labeled <strong>"Unknown Sources (Allow install of non-Market applications)"</strong>.
+          </p></li>
+
+          <li><p>
+            Tap on <strong>"Development"</strong>.
+          </p></li>
+
+          <li><p>
+            If it is not already checked, tap the option labeled <strong>"USB Debugging (Debug mode when USB is connected)"</strong>.
+          </p></li>
+        </ol>
+
+        <h3>Determining Which Version of Android Your Phone Is Running</h3>
+
+        <p>
+          If you don't know what version of Android your phone is running, you may need to look this up in order to modify the programs you write to support an older version.
+        </p>
+
+        <div class="alert alert-info">
+          The Eclipse projects in this class are configured to build with API 17 (Android 4.2, <em>Jelly Bean</em>) but to support running on devices as old as API 8 (Android 2.2, <em>Froyo</em>). If your phone is running an older version than 2.2, then you may need to modify the <code>AndroidManifest.xml</code> in your projects to get them to run properly.
+        </div>
+
+        <ol>
+          <li><p>
+            Go to your phone's <strong>"Settings"</strong> application.
+          </p></li>
+
+          <li><p>
+            Scroll down to <strong>"About phone"</strong> and tap it.
+          </p></li>
+
+          <li><p>
+            Scroll down to <strong>"Firmware version"</strong> and look at the number there. This number is the "Platform version", which corresponds to a particular API version in the SDK. For example, Android 2.1 corresponds to API level 7.
+          </p></li>
+        </ol>
+
+        <p>
+          A full listing of the current platform versions and the matching API level can be found here: <a href="http://developer.android.com/guide/appendix/api-levels.html">Android API Levels</a>.
+        </p>
+
+
+        <h3>Changing the Minimum API Level of a Project <em>(optional)</em></h3>
+
+        <p>
+          As mentioned above, the Eclipse projects that you start out with are configured for a minimum API level of 8, or Android 2.2. If your phone is running something older than this, then you will need to modify this API level so that the app will run on your phone.
+        </p><p>
+          <strong>Note:</strong> You can still run an app compiled with a higher version of the SDK (for example, 2.3.3 API level 10) on a phone with an older version of the OS (say, 2.1 API level 7), by setting the minimum SDK version appropriately. You must make sure, however, that you don't require any features that were introduced after that minimum version.
+        </p>
+
+        <div class="alert">
+          Sofia has only been tested on devices with API level 8 (Android 2.2) and higher. I make no guarantees that it will work on older devices. If you run into any odd behavior or errors, then you may need to go back to the emulator.
+        </div>
+
+        <ol>
+          <li><p>
+            Double-click the <code>AndroidManifest.xml</code> file in the project that you want to modify.
+          </p></li>
+
+          <li><p>
+            On the <strong>Manifest</strong> tab under <strong>Manifest Extras</strong>, click the <strong>"Uses Sdk"</strong> option.
+          </p></li>
+
+          <li><p>
+            Under the <strong>"Attributes for Uses Sdk"</strong> heading, change <strong>"Min SDK Version"</strong> to a lower API version that corresponds with your phone.
+          </p><p>
+            <img class="figure" src="img/ch1/uses-sdk.png"/>
+          </p></li>
+
+          <li><p>
+            Save your changes.
+          </p></li>
+        </ol>
+
+
+        <h3>Running an App on Your Phone</h3>
+
+        <p>
+          If you've correctly followed all the steps above, you should be ready to run an app that you've written on your phone.
+        </p>
+
+        <ol>
+          <li><p>
+            Connect your phone to your computer using the USB cable.
+          </p><p>
+            Some users (Windows and Linux) may need to install a USB driver or otherwise do some configuration for their phone to be properly recognized. If you have problems with the instructions below, you may find the information <a href="http://developer.android.com/guide/developing/device.html#setting-up">at this link</a> helpful.
+          </p></li>
+
+          <li><p>
+            Run your application (or your tests) as you normally would by selecting <strong>"Run As &gt; Android Application"</strong> or <strong>"Run As &gt; Android JUnit Test"</strong> in Eclipse.
+          </p></li>
+
+          <li><p>
+            If your phone is detected correctly, then the Android Device Chooser window should appear. The device chooser lets you decide whether you want to run the app on any phones that are connected to your computer, or on one of the virtual devices in the emulator.
+          </p><p>
+            <img class="figure window" src="img/ch1/device-chooser.png"/>
+          </p></li>
+
+          <li><p>
+            Make sure that <strong>"Choose a running Android device"</strong> is checked, then select the phone that you want to run the app on.
+          </p><p>
+            Notice that if your phone is running a lower version of Android than the SDK target that you are compiling with, you may see a red X in the "Target" column for that phone, as you can see in the screenshot. That's OK &ndash; the app will still run, as long as you didn't use any features that require a newer version of the OS.
+          </p></li>
+
+          <li><p>
+            Click <strong>"OK"</strong>. You will see some informational messages on the console, and after a moment the app should start on your phone. <strong>If your phone is asleep, you may need to wake it up/unlock it to see it.</strong>
+          </p></li>
+        </ol>
+
+      </div> <!-- page-content -->
+    </div> <!-- nav-and-contents -->
+  </div> <!-- page -->
+
+  <footer>
+    <div class="container">
+      <p class="pull-left">
+        &copy; 2012&ndash;2013 Tony Allevato
+      </p>
+      <p class="pull-right">
+        <a href="#">Back to top</a>
+      </p>
+    </div>
+  </footer><!-- footer -->
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+  <script src="codemirror/lib/codemirror.js" type="text/javascript"></script>
+  <script src="codemirror/mode/clike/clike.js" type="text/javascript"></script>
+  <script src="codemirror/mode/xml/xml.js" type="text/javascript"></script>
+  <script src="codemirror/lib/util/matchbrackets.js" type="text/javascript"></script>
+  <script src="js/book.js" type="text/javascript"></script>
+
+  </body>
+</html>

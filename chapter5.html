@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Chapter 5 &ndash; Advanced Graphics &ndash; Sofia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Tony Allevato">
+
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="codemirror/lib/codemirror.css" type="text/css"/>
+    <link rel="stylesheet" href="codemirror/theme/simple.css" type="text/css"/>
+    <link rel="stylesheet" href="css/style.css" type="text/css"/>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+  <div id="page">
+    <div id="nav-and-content">
+
+      <div id="contents">
+        <h1><a href="index.html">Sofia</a></h1>
+        <dl>
+          <dt>Introduction</dt>
+          <dd><a href="introduction.html">Philosophia Sofia</a></dd>
+
+          <dt>Chapter 1</dt>
+          <dd><a href="chapter1.html">Getting Started with Android</a></dd>
+
+          <dt>Chapter 2</dt>
+          <dd><a href="chapter2.html">Structure of an Android Application</a></dd>
+          
+          <dt>Chapter 3</dt>
+          <dd><a href="chapter3.html">Basic GUI-Driven Apps</a></dd>
+          
+          <dt>Chapter 4</dt>
+          <dd><a href="chapter4.html">Testing GUI Apps</a></dd>
+
+          <dt>Chapter 5</dt>
+          <dd><a href="chapter5.html">Advanced Graphics</a></dd>
+
+          <dt>Gallery</dt>
+          <dd><a href="gallery.html">Student Work Gallery</a></dd>
+
+          <dt>Appendix A</dt>
+          <dd><a href="http://sofia.cs.vt.edu/sofia-2114/api/reference">Sofia API</a></dd>
+
+          <dt>Appendix B</dt>
+          <dd><a href="downloads.html">Demos and Downloads</a></dd>
+        </dl>
+      </div>
+
+      <div id="page-content">
+
+        <div class="subcontents">
+        <h4>Jump to...</h4>
+        <ol>
+          <li><a href="#motivation">Why Do We Need Custom Graphics?</a></li>
+          <li><a href="#drawing-models">Computer Drawing Models</a></li>
+          <li><a href="#shape-types">Types of Shapes</a></li>
+          <li><a href="#colors">Colors</a></li>
+          <li><a href="#shape-screen">Shape Screens and Shape Views</a></li>
+          <li><a href="#touch-events">Handling Touch Events</a></li>
+          <li><a href="#animation">Animation</a></li>
+        </ol>
+        </div>
+
+        <h1><small>Chapter 5</small><br/>
+          Advanced Graphics</h1>
+
+        <div class="page-header"><h2 id="motivation">Why Do We Need Custom Graphics?</h2></div>
+
+        <img src="img/angry-birds.png" class="figure pull-right"
+          alt="Angry Birds is a property of Rovio."/>
+
+        <p>
+          Imagine that you want to write an app needs a more creative appearance or interaction than the standard widgets provide. This is often the case with games, but it can come up when designing other kinds of apps and utilities as well. Consider the popular game <em>Angry Birds</em>, shown to the right. The game mechanics and graphics could not be created using only the built-in Android buttons and text views.
+        </p><p>
+          In order to develop a game like this, we not only need a way to draw arbitrary graphics anywhere on the playing field, but also to handle touch events with more detail than just "something was clicked"&mdash;we might like to know when the user drags something from point A to point B, or support multi-touch on devices that provide that functionality.
+        </p><p>
+          Over the course of this chapter, we will use Sofia's graphics capabilities to develop a small knock-off of <em>Angry Birds</em>, shamelessly titled <em>Irritated Avians</em>. Though it will be split across a handful of classes in order to enforce good object-oriented design techniques, the entire app will come in at only <strong>121 lines</strong> of functional code! (That is, excluding blank lines, comments, and lines with only curly braces.)
+        </p>
+
+
+        <div class="page-header"><h2 id="drawing-models">Computer Drawing Models</h2></div>
+
+        <p>
+          APIs that allow programmers to create interesting computer graphics are often based on one of two major models:
+        </p>
+        <ul>
+          <li><p>
+            An <strong>object-driven drawing model</strong> is one in which you create objects that represent things to be drawn on the screen, such as circles, rectangles, images, and so forth. Each object maintains a <strong>state</strong> that you manipulate by calling getters and setters that defines what the visual properties of that object should be, such as its color and its position and size. You then <strong>add these objects</strong> to a "canvas" and the graphics framework ensures that the objects are rendered properly on the screen whenever the viewing area needs to be displayed.
+          </p></li>
+          <li><p>
+            An <strong>event-driven drawing model</strong> is one that is typically method-based instead of object-based. Under this model, there are no persistent objects that are added to a canvas. Instead, the operating system <strong>sends you an event</strong> to notify you that some portion of the viewing area needs to be redrawn (for example, the first time it appears on the screen). The previous state of the viewing area, if any, is typically not preserved, so you must redraw it from scratch every time you receive this notification. These drawings are often made by calling methods like <code>drawLine</code>, <code>drawRect</code>, and <code>drawBitmap</code> where each operation is a <strong>command</strong> that tells the operating system what to draw instead of an object.
+          </p></li>
+        </ul>
+        <p>
+          Traditional Android applications use the event-driven approach, but Sofia adds an object-driven model where the objects that you add to a canvas are <strong>shapes</strong>, some of which are primitives such as rectangles and ovals, and others which represent images and text labels. The focus of this chapter will be on this model.
+        </p>
+
+        
+        <img src="img/coordinate-system.png" class="figure pull-right"
+          alt="A coordinate system with the origin in the top-left corner."/>
+
+        <h3>Graphical Coordinate System</h3>
+
+        <p>
+          In geometry class, we learn a standard Cartesian coordinate system where the origin of the plane, denoted (0, 0), is located in the center of a pair of intersecting axes, and the horizontal axis (<i>x</i>) goes right in the positive direction and the vertical axis (<i>y</i>) goes up in the positive direction.
+        </p><p>
+          However, for historical reasons most computer graphics systems invert the <i>y</i>-axis so that the origin is in the top-left corner and it goes down in the positive direction. (See the figure to the right.) Android uses such a coordinate system, as does Sofia. Each unit in this coordinate system represents one pixel on the screen.
+        </p><p>
+          If the app you are developing is using static graphics, you can keep the coordinate system the way it is by default. However, if you are developing a game using its physics features, you <strong>must</strong> change the coordinate system to use appropriate units. The underlying physics simulator has been tuned to use real-world units&mdash;meters, kilograms, and seconds&mdash;and works best with moving objects between 0.1 and 10 meters in size. Static objects can typically be up to 50 meters in size without causing problems. Using pixels as units in a physical simulation will lead to disaster, because a shape that is 200 pixels tall will be seen by the simulator as being 200 <strong>meters</strong>&mdash;roughly a 45-story building! Similarly, it would be more useful for physical simulations to have 0 on the y-axis represent the ground and have that axis grow upward, as it does in the real world.
+        </p><p>
+          The section on Shape Screens and Shape Views describes how to modify the coordinate system in these situations.
+        </p>
+
+
+        <div class="page-header"><h2 id="shape-types">Types of Shapes</h2></div>
+
+        <p>
+          Sofia contains a hierarchy of shape classes that use of polymorphism and method overriding to provide several types of shapes that have a common base class. All shapes in Sofia extend the abstract <code class="link">sofia.graphics.Shape</code> class, which maintains properties that all shapes have in common&mdash;their size and position, color, and rotation.
+        </p><p>
+
+        </p><p>
+          The table below lists all of the concrete types of shapes that you can create and use in your own apps:
+        </p>
+
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code class="link">sofia.graphics.RectangleShape</code></td>
+              <td>Displays a rectangle (or square, if the width and height are the same). This shape can be drawn as a hollow outline or filled with a color or an image.</td>
+            </tr>
+            <tr>
+              <td><code class="link">sofia.graphics.OvalShape</code></td>
+              <td>Displays an oval (or circle, if the width and height are the same). This shape can be drawn as a hollow outline or filled with a color or an image.</td>
+            </tr>
+            <tr>
+              <td><code class="link">sofia.graphics.LineShape</code></td>
+              <td>Displays a line between two points.</td>
+            </tr>
+            <tr>
+              <td><code class="link">sofia.graphics.TextShape</code></td>
+              <td>A shape that renders a text string. You can use this shape class to create text displays among other graphics in your app, such as a scoreboard in a game.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          The various shape classes have a number of constructors that make it easy to create these shapes with different positions, sizes, and other required visual properties. Each type of shape is summarized below.
+        </p>
+
+
+        <h3>Rectangles</h3>
+
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Constructor</th>
+              <th>Effect</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="width: 40%"><code class="link">sofia.graphics.RectangleShape#RectangleShape(float, float, float, float)</code></td>
+              <td>Creates a rectangle from four coordinates, in the following order: the <i>x</i>-coordinate of the <em>left</em> side, the <i>y</i>-coordinate of the <em>top</em>, the <i>x</i>-coordinate of the <em>right</em> side, and the <i>y</i>-coordinate of the <em>bottom</em>.</td>
+            </tr>
+            <tr>
+              <td><code class="link">sofia.graphics.RectangleShape#RectangleShape(RectF)</code></td>
+              <td>Creates a rectangle from a <code class="link">android.graphics.RectF</code> object, which is an object that encapsulates the left, top, right, and bottom coordinates of a rectangle.</td>
+            </tr>
+          </tbody>
+        </table>
+
+
+        <h3>Ovals</h3>
+
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Constructor</th>
+              <th>Effect</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="width: 40%"><code class="link">sofia.graphics.OvalShape#OvalShape(float, float, float, float)</code></td>
+              <td>Creates an oval from four coordinates, in the following order: the <i>x</i>-coordinate of the <em>center</em> of the oval, the <i>y</i>-coordinate of the <em>center</em> of the oval, the <em>horizontal radius</em>, and the <em>vertical radius</em>.</td>
+            </tr>
+            <tr>
+              <td><code class="link">sofia.graphics.OvalShape#OvalShape(float, float, float)</code></td>
+              <td>Creates a <strong>circular</strong> oval from three coordinates, in the following order: the <i>x</i>-coordinate of the <em>center</em> of the oval, the <i>y</i>-coordinate of the <em>center</em> of the oval, and the <em>radius</em>.</td>
+            </tr>
+            <tr>
+              <td><code class="link">sofia.graphics.OvalShape#OvalShape(RectF)</code></td>
+              <td>Creates an oval from a <code class="link">android.graphics.RectF</code> object, which is an object that encapsulates the left, top, right, and bottom coordinates of a rectangle. The oval that is created is the largest oval that would fit inside that rectangle (in other words, the width of the rectangle is its horizontal diameter and the height of the rectangle is its vertical diameter).</td>
+            </tr>
+          </tbody>
+        </table>
+
+
+        <h3>Lines</h3>
+
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Constructor</th>
+              <th>Effect</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="width: 40%"><code class="link">sofia.graphics.LineShape#LineShape(float, float, float, float)</code></td>
+              <td>Creates a line from four coordinates, in the following order: the <i>x</i>-coordinate of the first endpoint, the <i>y</i>-coordinate of the first endpoint, the <i>x</i>-coordinate of the second endpoint, and the <i>y</i>-coordinate of the second endpoint.</td>
+            </tr>
+            <tr>
+              <td><code class="link">sofia.graphics.LineShape#LineShape(RectF)</code></td>
+              <td>Creates a line from a <code class="link">android.graphics.RectF</code> object, which is an object that encapsulates the left, top, right, and bottom coordinates of a rectangle. The endpoints of the line are (<i>left</i>, <i>top</i>) and (<i>right</i>, <i>bottom</i>).</td>
+            </tr>
+          </tbody>
+        </table>
+
+
+        <h3>Text Shapes</h3>
+
+        <p>
+          The <code class="link">sofia.graphics.TextShape</code> class lets you display a text string on your screen. These can be used, for example, to incorporate information in a game like player's health or their current score.
+        </p>
+
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Constructor</th>
+              <th>Effect</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="width: 40%"><code class="link">sofia.graphics.TextShape#TextShape(String, float, float)</code></td>
+              <td>Creates a new shape that will draw the text specified by the <code>String</code> parameter. The text will be anchored so that the top-left corner of the box containing the text is at the <i>x</i>- and <i>y</i>-coordinates indicated by the two <code>float</code> parameters.</td>
+            </tr>
+          </tbody>
+        </table>
+
+
+        <h3>Using Images</h3>
+
+        <p>
+          Sofia does not provide a separate class for shapes that draw images on the screen. Instead, any of the fillable shapes (rectangles and ovals) can be filled with an image instead of a color. To set the image used by a shape, call the <code class="link">sofia.graphics.FillableShape#setImage(String)</code> method.
+        </p><p>
+          Images are stored in one of the <code>res/drawable-*</code> folders in your Eclipse project. When you call <code>setImage</code>, you refer to the image using its filename without an extension. For example, if you have images named <code>res/drawable-*/piggy.png</code> in your project (where the <code>*</code> refers to any of the resolution identifiers like <code>hdpi</code>, <code>mdpi</code>, and so on), then you would pass in simply <code>"piggy"</code> and the image that most closely matches your device's screen resolution would be used.
+        </p>
+
+
+        <h3>Subclassing the Built-in Shapes</h3>
+
+        <p>
+          Even though they're objects, you should think of the shape classes provided by Sofia as primitive graphical constructs and not part of a richer data model. Let's think about our <em>Irritated Avians</em> game. We'll need shapes to represent the piggies and the birds, but perhaps other objects as well&mdash;the background of the screen would be an image, the slingshot would need to be represented, and so forth.
+        </p><p>
+          If you want birds and piggies to act like round objects in a physical world (e.g., the way that they roll and bounce when hit), then you could use <code>OvalShape</code> objects to represent them. However, it would be bad design to have your program logic manipulate primitive <code>OvalShape</code> objects directly. Instead, you can <strong>extend</strong> the built-in shapes to make them specific to your app and customize them by adding your own logic.
+        </p><p>
+          When we're designing an application, it's best to work on our data model before we dive into the GUI portion. Let's create a shape that will represent our piggies:
+        </p>
+
+<pre data-title="Piggy.java">
+public class Piggy extends OvalShape
+{
+    // The piggy's radii.
+    private static final float HRADIUS = 1.7f;
+    private static final float VRADIUS = 1.5f;
+
+    public Piggy(float x, float y)
+    {
+        super(x, y, HRADIUS, VRADIUS);
+
+        setImage("green_pig");
+        setDensity(1);
+    }
+}
+</pre>
+
+        <p>
+          Even though <code>Piggy</code> extends <code>OvalShape</code>, notice that we have given it a constructor that only takes the position of the shape and not its size or the image that it should use. This is because we want all instances of <code>Piggy</code> to use the same size and fixed image (in this case, the <code>"green_pig"</code> drawable resource). We achieve this by calling the <code>super</code> constructor and passing it the additional parameters, or by using <code>OvalShape</code>'s own setter methods. Providing defaults like this is good design so that the user of the class only needs to provide the information about the object that might change, and not have to repeatedly provide the invariants.
+        </p><p>
+          The call to <code>setDensity</code> adjusts that physical property of the shape, when we start using the real-time physics capabilities of Sofia. For the purposes of this game, the piggies will be <strong>static</strong> and not move around on the screen.
+        </p><p>
+          Now let's create the piggy's mortal enemy: the <code>Bird</code>. 
+        </p>
+
+<pre data-title="Bird.java">
+public class Bird extends OvalShape
+{
+    // The bird's radii.
+    private static final float HRADIUS = 1.5f;
+    private static final float VRADIUS = 1.3f;
+
+    private PointF startingPosition;
+
+    public Bird(float x, float y)
+    {
+        super(x, y, HRADIUS, VRADIUS);
+
+        // Keep track of the starting position because we'll want to
+        // reset the bird after a hit.
+        startingPosition = new PointF(x, y);
+
+        // Set invariant properties of the bird.
+        setImage("red_bird");
+        setDensity(2);
+        setShapeMotion(ShapeMotion.DYNAMIC);
+        setRestitution(0.4f);
+        setFriction(2.0f);
+
+        // See below.
+        reset();
+    }
+
+
+    /**
+     * The reset method stops the bird's motion and repositions it back
+     * at the starting position. This is called when the bird is first
+     * created, and also once it has come to rest.
+     */
+    private void reset()
+    {
+        setGravityScale(0);
+        setLinearVelocity(0, 0);
+        setRotation(0);
+        setPosition(startingPosition);
+    }
+}
+</pre>
+
+        <p>
+          There's a bit more going on here, but it's all fairly straightforward. We make use of the superclass constructor for the bird, just as we did for the piggy. Then we store the starting position so that we can recall it again later when we need to reset the bird's position. (In our game, we have an infinitely recyclable bird.)
+        </p><p>
+          Then, we set some of the visual and physical properties of the bird. Its image comes from the <code>red_bird</code> drawable resource, and it's twice as dense as a piggy. 
+        </p><p>
+          The <code>setShapeMotion</code> method describes how the bird reacts to forces and collisions. Shapes are static (<code>ShapeMotion.STATIC</code>) by default, meaning that they are not affected by forces. To make a shape be capable of motion and respond to forces such as gravity and collisions, we must set its motion type to <code>ShapeMotion.DYNAMIC</code>.
+        </p><p>
+          Finally, we set two more properties: restitution and friction. <em>Restitution</em> is another word for "bounciness" or "elasticity". Essentially, when this shape collides with another shape, what will its speed after the collision compared to its speed before the collision? Restitution values close to zero mean that the shape will barely bounce at all&mdash;its motion will nearly cease when it collides. Values close to one mean that the shape will have a great deal of elasticity. Values greater than one can also be used&mdash;these could be used to simulate explosions that <em>generate</em> energy and cause an object to blast away from the impact.
+        </p><p>
+          The other property, <em>friction</em>, has the traditional physical meaning, and controls how two shapes react when they roll or slide against each other.
+        </p>
+
+        <div class="page-header"><h2 id="colors">Colors</h2></div>
+
+        <img class="figure pull-right" src="img/additive-color.png"/>
+
+        <p>
+          Sofia provides a <code class="link">sofia.graphics.Color</code> class that allows you to create objects that represent colors for shapes and other purposes.
+        </p><p>
+          On computer displays, colors are formed by mixing the three primary color components&mdash;<strong style="color: red">red</strong>, <strong style="color: green">green</strong>, and <strong style="color: blue">blue</strong> (collectively known as <strong>RGB</strong>). Each of these components is represented by an integer between 0 and 255, where 0 means that the component is absent from the color and 255 means the component is contributing maximally to the color. So for example, a color with a red component of 255 and green and blue components of 0 would represent the brightest shade of red that your display can produce. If you changed red to be 128, then it would be a shade of red with 50% brightness.
+        </p><p>
+          The figure to the right shows the colors that could be created by mixing different combinations of the primary colors at full strength. For example, red and green combine to form yellow. The absence of all three color components produces black, and the full presence of every color component produces white. When each of the RGB values is the same, shades of gray are produced.
+        </p><p>
+          In addition to the red, green, and blue components, colors also contain an <strong>alpha</strong> component that describes how <em>transparent</em> the color is when it is drawn on the screen. Like the other three components, alpha is an integer value between 0 and 255, where 0 means that the color is completely transparent (invisible) and 255 means that the color is completely opaque (nothing behind it would show through). By using alpha in your drawings, you can create some interesting blending effects.
+        </p>
+
+        <div class="alert alert-info">
+          The RGB color scheme is called an <strong>additive color</strong> scheme because different colors of light are added together to form new colors. The stronger each component is, the brighter the color will be. This is the opposite of the <strong>subtractive color</strong> scheme that you grew up with as a child, which had the primary colors red, yellow, and blue. This scheme is subtractive because the various pigments <em>absorb</em> light, so mixing them produces darker colors instead of lighter ones.
+        </div>
+
+
+        <h3>Pre-Defined Colors</h3>
+
+        <p>
+          To make as easy as possible to use colors right out of the box, Sofia's <code>Color</code> class provides 140 pre-defined colors&mdash;the same set that is defined in CSS for web development. Hover over the color swatches below to see the name of the constant in the <code>Color</code> class that will produce that color.
+        </p>
+
+        <div class="figure full swatches">
+          <div>
+            <div style="background-color: #FFB6C1" class="swatch" rel="tooltip" title="Color.lightPink"></div>
+            <div style="background-color: #FFC0CB" class="swatch" rel="tooltip" title="Color.pink"></div>
+            <div style="background-color: #DC143C" class="swatch" rel="tooltip" title="Color.crimson"></div>
+            <div style="background-color: #FFF0F5" class="swatch" rel="tooltip" title="Color.lavenderBlush"></div>
+            <div style="background-color: #DB7093" class="swatch" rel="tooltip" title="Color.paleVioletRed"></div>
+            <div style="background-color: #FF69B4" class="swatch" rel="tooltip" title="Color.hotPink"></div>
+            <div style="background-color: #FF1493" class="swatch" rel="tooltip" title="Color.deepPink"></div>
+            <div style="background-color: #C71585" class="swatch" rel="tooltip" title="Color.mediumVioletRed"></div>
+            <div style="background-color: #DA70D6" class="swatch" rel="tooltip" title="Color.orchid"></div>
+            <div style="background-color: #D8BFD8" class="swatch" rel="tooltip" title="Color.thistle"></div>
+            <div style="background-color: #DDA0DD" class="swatch" rel="tooltip" title="Color.plum"></div>
+            <div style="background-color: #EE82EE" class="swatch" rel="tooltip" title="Color.violet"></div>
+            <div style="background-color: #FF00FF" class="swatch" rel="tooltip" title="Color.magenta"></div>
+            <div style="background-color: #FF00FF" class="swatch" rel="tooltip" title="Color.fuchsia"></div>
+            <div style="background-color: #8B008B" class="swatch" rel="tooltip" title="Color.darkMagenta"></div>
+            <div style="background-color: #800080" class="swatch" rel="tooltip" title="Color.purple"></div>
+            <div style="background-color: #BA55D3" class="swatch" rel="tooltip" title="Color.mediumOrchid"></div>
+            <div style="background-color: #9400D3" class="swatch" rel="tooltip" title="Color.darkViolet"></div>
+            <div style="background-color: #9932CC" class="swatch" rel="tooltip" title="Color.darkOrchid"></div>
+            <div style="background-color: #4B0082" class="swatch" rel="tooltip" title="Color.indigo"></div>
+          </div><div>
+            <div style="background-color: #8A2BE2" class="swatch" rel="tooltip" title="Color.blueViolet"></div>
+            <div style="background-color: #9370DB" class="swatch" rel="tooltip" title="Color.mediumPurple"></div>
+            <div style="background-color: #7B68EE" class="swatch" rel="tooltip" title="Color.mediumSlateBlue"></div>
+            <div style="background-color: #6A5ACD" class="swatch" rel="tooltip" title="Color.slateBlue"></div>
+            <div style="background-color: #483D8B" class="swatch" rel="tooltip" title="Color.darkSlateBlue"></div>
+            <div style="background-color: #E6E6FA" class="swatch" rel="tooltip" title="Color.lavender"></div>
+            <div style="background-color: #F8F8FF" class="swatch" rel="tooltip" title="Color.ghostWhite"></div>
+            <div style="background-color: #0000FF" class="swatch" rel="tooltip" title="Color.blue"></div>
+            <div style="background-color: #0000CD" class="swatch" rel="tooltip" title="Color.mediumBlue"></div>
+            <div style="background-color: #191970" class="swatch" rel="tooltip" title="Color.midnightBlue"></div>
+            <div style="background-color: #00008B" class="swatch" rel="tooltip" title="Color.darkBlue"></div>
+            <div style="background-color: #000080" class="swatch" rel="tooltip" title="Color.navy"></div>
+            <div style="background-color: #4169E1" class="swatch" rel="tooltip" title="Color.royalBlue"></div>
+            <div style="background-color: #6495ED" class="swatch" rel="tooltip" title="Color.cornflowerBlue"></div>
+            <div style="background-color: #B0C4DE" class="swatch" rel="tooltip" title="Color.lightSteelBlue"></div>
+            <div style="background-color: #778899" class="swatch" rel="tooltip" title="Color.lightSlateGray"></div>
+            <div style="background-color: #708090" class="swatch" rel="tooltip" title="Color.slateGray"></div>
+            <div style="background-color: #1E90FF" class="swatch" rel="tooltip" title="Color.dodgerBlue"></div>
+            <div style="background-color: #F0F8FF" class="swatch" rel="tooltip" title="Color.aliceBlue"></div>
+            <div style="background-color: #4682B4" class="swatch" rel="tooltip" title="Color.steelBlue"></div>
+          </div><div>
+            <div style="background-color: #87CEFA" class="swatch" rel="tooltip" title="Color.lightSkyBlue"></div>
+            <div style="background-color: #87CEEB" class="swatch" rel="tooltip" title="Color.skyBlue"></div>
+            <div style="background-color: #00BFFF" class="swatch" rel="tooltip" title="Color.deepSkyBlue"></div>
+            <div style="background-color: #ADD8E6" class="swatch" rel="tooltip" title="Color.lightBlue"></div>
+            <div style="background-color: #B0E0E6" class="swatch" rel="tooltip" title="Color.powderBlue"></div>
+            <div style="background-color: #5F9EA0" class="swatch" rel="tooltip" title="Color.cadetBlue"></div>
+            <div style="background-color: #F0FFFF" class="swatch" rel="tooltip" title="Color.azure"></div>
+            <div style="background-color: #E0FFFF" class="swatch" rel="tooltip" title="Color.lightCyan"></div>
+            <div style="background-color: #AFEEEE" class="swatch" rel="tooltip" title="Color.paleTurquoise"></div>
+            <div style="background-color: #00FFFF" class="swatch" rel="tooltip" title="Color.cyan"></div>
+            <div style="background-color: #00FFFF" class="swatch" rel="tooltip" title="Color.aqua"></div>
+            <div style="background-color: #00CED1" class="swatch" rel="tooltip" title="Color.darkTurquoise"></div>
+            <div style="background-color: #2F4F4F" class="swatch" rel="tooltip" title="Color.darkSlateGray"></div>
+            <div style="background-color: #008B8B" class="swatch" rel="tooltip" title="Color.darkCyan"></div>
+            <div style="background-color: #008080" class="swatch" rel="tooltip" title="Color.teal"></div>
+            <div style="background-color: #48D1CC" class="swatch" rel="tooltip" title="Color.mediumTurquoise"></div>
+            <div style="background-color: #20B2AA" class="swatch" rel="tooltip" title="Color.lightSeaGreen"></div>
+            <div style="background-color: #40E0D0" class="swatch" rel="tooltip" title="Color.turquoise"></div>
+            <div style="background-color: #7FFFD4" class="swatch" rel="tooltip" title="Color.aquamarine"></div>
+            <div style="background-color: #66CDAA" class="swatch" rel="tooltip" title="Color.mediumAquamarine"></div>
+          </div><div>
+            <div style="background-color: #00FA9A" class="swatch" rel="tooltip" title="Color.mediumSpringGreen"></div>
+            <div style="background-color: #F5FFFA" class="swatch" rel="tooltip" title="Color.mintCream"></div>
+            <div style="background-color: #00FF7F" class="swatch" rel="tooltip" title="Color.springGreen"></div>
+            <div style="background-color: #3CB371" class="swatch" rel="tooltip" title="Color.mediumSeaGreen"></div>
+            <div style="background-color: #2E8B57" class="swatch" rel="tooltip" title="Color.seaGreen"></div>
+            <div style="background-color: #F0FFF0" class="swatch" rel="tooltip" title="Color.honeydew"></div>
+            <div style="background-color: #90EE90" class="swatch" rel="tooltip" title="Color.lightGreen"></div>
+            <div style="background-color: #98FB98" class="swatch" rel="tooltip" title="Color.paleGreen"></div>
+            <div style="background-color: #8FBC8F" class="swatch" rel="tooltip" title="Color.darkSeaGreen"></div>
+            <div style="background-color: #32CD32" class="swatch" rel="tooltip" title="Color.limeGreen"></div>
+            <div style="background-color: #00FF00" class="swatch" rel="tooltip" title="Color.lime"></div>
+            <div style="background-color: #228B22" class="swatch" rel="tooltip" title="Color.forestGreen"></div>
+            <div style="background-color: #008000" class="swatch" rel="tooltip" title="Color.green"></div>
+            <div style="background-color: #006400" class="swatch" rel="tooltip" title="Color.darkGreen"></div>
+            <div style="background-color: #7FFF00" class="swatch" rel="tooltip" title="Color.chartreuse"></div>
+            <div style="background-color: #7CFC00" class="swatch" rel="tooltip" title="Color.lawnGreen"></div>
+            <div style="background-color: #ADFF2F" class="swatch" rel="tooltip" title="Color.greenYellow"></div>
+            <div style="background-color: #556B2F" class="swatch" rel="tooltip" title="Color.darkOliveGreen"></div>
+            <div style="background-color: #9ACD32" class="swatch" rel="tooltip" title="Color.yellowGreen"></div>
+            <div style="background-color: #6B8E23" class="swatch" rel="tooltip" title="Color.oliveDrab"></div>
+          </div><div>
+            <div style="background-color: #F5F5DC" class="swatch" rel="tooltip" title="Color.beige"></div>
+            <div style="background-color: #FAFAD2" class="swatch" rel="tooltip" title="Color.lightGoldenrodYellow"></div>
+            <div style="background-color: #FFFFF0" class="swatch" rel="tooltip" title="Color.ivory"></div>
+            <div style="background-color: #FFFFE0" class="swatch" rel="tooltip" title="Color.lightYellow"></div>
+            <div style="background-color: #FFFF00" class="swatch" rel="tooltip" title="Color.yellow"></div>
+            <div style="background-color: #808000" class="swatch" rel="tooltip" title="Color.olive"></div>
+            <div style="background-color: #BDB76B" class="swatch" rel="tooltip" title="Color.darkKhaki"></div>
+            <div style="background-color: #FFFACD" class="swatch" rel="tooltip" title="Color.lemonChiffon"></div>
+            <div style="background-color: #EEE8AA" class="swatch" rel="tooltip" title="Color.paleGoldenrod"></div>
+            <div style="background-color: #F0E68C" class="swatch" rel="tooltip" title="Color.khaki"></div>
+            <div style="background-color: #FFD700" class="swatch" rel="tooltip" title="Color.gold"></div>
+            <div style="background-color: #FFF8DC" class="swatch" rel="tooltip" title="Color.cornsilk"></div>
+            <div style="background-color: #DAA520" class="swatch" rel="tooltip" title="Color.goldenrod"></div>
+            <div style="background-color: #B8860B" class="swatch" rel="tooltip" title="Color.darkGoldenrod"></div>
+            <div style="background-color: #FFFAF0" class="swatch" rel="tooltip" title="Color.floralWhite"></div>
+            <div style="background-color: #FDF5E6" class="swatch" rel="tooltip" title="Color.oldLace"></div>
+            <div style="background-color: #F5DEB3" class="swatch" rel="tooltip" title="Color.wheat"></div>
+            <div style="background-color: #FFE4B5" class="swatch" rel="tooltip" title="Color.moccasin"></div>
+            <div style="background-color: #FFA500" class="swatch" rel="tooltip" title="Color.orange"></div>
+            <div style="background-color: #FFEFD5" class="swatch" rel="tooltip" title="Color.papayaWhip"></div>
+          </div><div>
+            <div style="background-color: #FFEBCD" class="swatch" rel="tooltip" title="Color.blanchedAlmond"></div>
+            <div style="background-color: #FFDEAD" class="swatch" rel="tooltip" title="Color.navajoWhite"></div>
+            <div style="background-color: #FAEBD7" class="swatch" rel="tooltip" title="Color.antiqueWhite"></div>
+            <div style="background-color: #D2B48C" class="swatch" rel="tooltip" title="Color.tan"></div>
+            <div style="background-color: #DEB887" class="swatch" rel="tooltip" title="Color.burlyWood"></div>
+            <div style="background-color: #FFE4C4" class="swatch" rel="tooltip" title="Color.bisque"></div>
+            <div style="background-color: #FF8C00" class="swatch" rel="tooltip" title="Color.darkOrange"></div>
+            <div style="background-color: #FAF0E6" class="swatch" rel="tooltip" title="Color.linen"></div>
+            <div style="background-color: #CD853F" class="swatch" rel="tooltip" title="Color.peru"></div>
+            <div style="background-color: #FFDAB9" class="swatch" rel="tooltip" title="Color.peachPuff"></div>
+            <div style="background-color: #F4A460" class="swatch" rel="tooltip" title="Color.sandyBrown"></div>
+            <div style="background-color: #D2691E" class="swatch" rel="tooltip" title="Color.chocolate"></div>
+            <div style="background-color: #8B4513" class="swatch" rel="tooltip" title="Color.saddleBrown"></div>
+            <div style="background-color: #FFF5EE" class="swatch" rel="tooltip" title="Color.seashell"></div>
+            <div style="background-color: #A0522D" class="swatch" rel="tooltip" title="Color.sienna"></div>
+            <div style="background-color: #FFA07A" class="swatch" rel="tooltip" title="Color.lightSalmon"></div>
+            <div style="background-color: #FF7F50" class="swatch" rel="tooltip" title="Color.coral"></div>
+            <div style="background-color: #FF4500" class="swatch" rel="tooltip" title="Color.orangeRed"></div>
+            <div style="background-color: #E9967A" class="swatch" rel="tooltip" title="Color.darkSalmon"></div>
+            <div style="background-color: #FF6347" class="swatch" rel="tooltip" title="Color.tomato"></div>
+          </div><div>
+            <div style="background-color: #FFE4E1" class="swatch" rel="tooltip" title="Color.mistyRose"></div>
+            <div style="background-color: #FA8072" class="swatch" rel="tooltip" title="Color.salmon"></div>
+            <div style="background-color: #FFFAFA" class="swatch" rel="tooltip" title="Color.snow"></div>
+            <div style="background-color: #F08080" class="swatch" rel="tooltip" title="Color.lightCoral"></div>
+            <div style="background-color: #BC8F8F" class="swatch" rel="tooltip" title="Color.rosyBrown"></div>
+            <div style="background-color: #CD5C5C" class="swatch" rel="tooltip" title="Color.indianRed"></div>
+            <div style="background-color: #FF0000" class="swatch" rel="tooltip" title="Color.red"></div>
+            <div style="background-color: #A52A2A" class="swatch" rel="tooltip" title="Color.brown"></div>
+            <div style="background-color: #B22222" class="swatch" rel="tooltip" title="Color.fireBrick"></div>
+            <div style="background-color: #8B0000" class="swatch" rel="tooltip" title="Color.darkRed"></div>
+            <div style="background-color: #800000" class="swatch" rel="tooltip" title="Color.maroon"></div>
+            <div style="background-color: #FFFFFF" class="swatch" rel="tooltip" title="Color.white"></div>
+            <div style="background-color: #F5F5F5" class="swatch" rel="tooltip" title="Color.whiteSmoke"></div>
+            <div style="background-color: #DCDCDC" class="swatch" rel="tooltip" title="Color.gainsboro"></div>
+            <div style="background-color: #D3D3D3" class="swatch" rel="tooltip" title="Color.lightGray"></div>
+            <div style="background-color: #C0C0C0" class="swatch" rel="tooltip" title="Color.silver"></div>
+            <div style="background-color: #A9A9A9" class="swatch" rel="tooltip" title="Color.darkGray"></div>
+            <div style="background-color: #808080" class="swatch" rel="tooltip" title="Color.gray"></div>
+            <div style="background-color: #696969" class="swatch" rel="tooltip" title="Color.dimGray"></div>
+            <div style="background-color: #000000" class="swatch" rel="tooltip" title="Color.black"></div>
+          </div>
+        </div>
+
+        <div class="alert alert-info">
+          For strange historical reasons, <code>Color.gray</code> is actually darker than <code>Color.darkGray</code> &ndash; probably not what you would expect! So be careful if you're using these two colors together.
+        </div>
+
+        <p>
+          For situations where none of these 140 colors is sufficient, the <code>Color</code> class provides a number of static <strong>factory methods</strong> that you can use to create new ones:
+        </p>
+
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th style="width: 30%">Method</th>
+              <th>Effect</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code class="link">sofia.graphics.Color#gray(int)</td>
+              <td>Returns a shade of gray. The gray level passed into this method must be between 0 and 255, where 0 is black and 255 is white.</td>
+            </tr>
+            <tr>
+              <td><code class="link">sofia.graphics.Color#gray(int, int)</td>
+              <td>Returns a shade of gray. The first parameter is the gray level; the second parameter is the alpha component.</td>
+            </tr>
+            <tr>
+              <td><code class="link">sofia.graphics.Color#rgb(int, int, int)</td>
+              <td>Returns a color from its red, green, and blue components.</td>
+            </tr>
+            <tr>
+              <td><code class="link">sofia.graphics.Color#rgb(int, int, int, int)</td>
+              <td>Returns a color from its red, green, blue, and alpha components.</td>
+            </tr>
+            <tr>
+              <td><code class="link">sofia.graphics.Color#hsv(float, float, float)</td>
+              <td>Returns a color from its hue, saturation, and value components. Hue is a value between 0 and 360; saturation and value are between 0 and 1. More information about HSV color representation can be found in <a href="http://en.wikipedia.org/wiki/HSL_and_HSV">this Wikipedia article</a>.</td>
+            </tr>
+            <tr>
+              <td><code class="link">sofia.graphics.Color#hsv(float, float, float, int)</td>
+              <td>Returns a color from its hue, saturation, value, and alpha components.</td>
+            </tr>
+            <tr>
+              <td><code class="link">sofia.graphics.Color#getRandomColor()</td>
+              <td>Returns a color with random red, green, and blue components. The alpha of the color returned will always be 255.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="alert alert-info">
+          <p>
+            Objects that represent colors are a Sofia feature not found in Android. The traditional Android API represents colors simply as integers that combine the red, green, blue, and alpha components into a single number. Android <em>does</em> contain a <code class="link">android.graphics.Color</code> class, but you cannot create objects from it. Instead, it only provides static methods to manipulate color integers.
+          </p><p>
+            If you want to use Sofia <code>Color</code> objects with traditional Android APIs that expect colors to be represented as integers, you can call the <code class="link">sofia.graphics.Color#toRawColor()</code> method to return the integer representation of a <code>Color</code> object. Likewise, the <code class="link">sofia.graphics.Color#fromRawColor(int)</code> method will create a <code>Color</code> object from a color integer.
+          </p>
+        </div>
+
+
+        <div class="page-header"><h2 id="shape-screen">Shape Screens and Shape Views</h2></div>
+
+        <p>
+          Now that we've talked about the shapes themselves, let's take a moment to discuss where they go once you create them. Recall that the <code class="link">sofia.app.Screen</code> class acts as the <strong>controller</strong> for GUI-driven applications that use a layout defined in your app's resources.
+        </p><p>
+          What if&mdash;instead of a GUI filled with buttons and other widgets&mdash;you just wanted to create a full-screen drawing canvas where shapes could be drawn, manipulated, and animated?
+        </p><p>
+          Sofia provides a <code class="link">sofia.app.ShapeScreen</code> class that does exactly this. If you extend <code>ShapeScreen</code>, then that screen in your app will automatically have a full-sized shape canvas where you can add your shapes.
+        </p><p>
+          As before, you should implement the <code>initialize()</code> method in your screen class to prepare what it should look like before it is displayed to the user. Consider the following example:
+        </p>
+
+<pre>
+import sofia.app.*;
+import sofia.graphics.*;
+
+public class IrritatedAviansScreen extends ShapeScreen
+{
+    public void initialize()
+    {
+        // Add shapes to the screen here.
+    }
+}
+</pre>
+
+        <p>
+          In the first three lines of the method, we created a rectangular shape positioned at (0, 0), the top-left corner of the screen, with a width and height of 50 pixels (so it is square), and made it filled with the color red. Creating the shape is not enough to display it on the screen, however. It must be <strong>added</strong> to the screen; this allows you to create shapes earlier in the program and only add them to the screen when they need to be shown, if you wish.
+        </p><p>
+          The <code class="link">sofia.app.ShapeScreen#add(Shape)</code> method on the last line is inherited from <code>ShapeScreen</code> and adds the shape to the screen, which refreshes the screen so that the shape is now made visible. In addition to this method, the following other methods let you manipulate shapes on the screen:
+        </p>
+
+        <table class="table table-bordered">
+          <tbody>
+            <tr>
+              <td><code class="link">sofia.graphics.ShapeScreen#add(Shape)</td>
+              <td>Adds a shape to the screen.</td>
+            </tr>
+            <tr>
+              <td><code class="link">sofia.graphics.ShapeScreen#remove(Shape)</td>
+              <td>Removes the specified shape from the screen, causing it to no longer be drawn.</td>
+            </tr>
+            <tr>
+              <td><code class="link">sofia.graphics.ShapeScreen#clear()</td>
+              <td>Removes <strong>every</strong> shape from the screen. When it is redrawn, it will appear blank.</td>
+            </tr>
+          </tbody>
+        </table>
+
+
+        <h3>The Order of Shapes</h3>
+
+        <p>
+          Very frequently, you'll add shapes to the screen that overlap with other shapes that are already there. Shapes are drawn in the order that they are added, which means that shapes that you add later will obscure shapes that were added earlier if they overlap.
+        </p><p>
+          It is possible to override this behavior by modifying the <strong>z-index</strong> of a shape. You can think of the z-index as a value along an imaginary third axis that projects out of the screen toward the user. By default, all shapes have a z-index of zero. To change this value for a shape, call its <code class="link">sofia.graphics.Shape#setZIndex(int)</code> method and pass it any negative or positive integer value. Shapes with higher z-indexes will always be drawn on top of shapes with lower z-indexes, regardless of the actual order that they were added to the canvas.
+        </p>
+
+
+        <h3>Adjusting to Different Screen Sizes</h3>
+
+        <p>
+          There is a wide variety of Android devices on the market, both smartphones and tablets, and these devices come in many different screen sizes and resolutions. Because of this, you should <strong>never</strong> write code that assumes that the screen has a particular width or height.
+        </p><p>
+          Instead, you should write code that adjusts to the screen size dynamically. The <code>ShapeScreen</code> class has two methods that let you ask what the size of the screen is: <code class="link">sofia.app.ShapeScreen#getWidth()</code> returns the width of the screen in pixels, and <code class="link">sofia.app.ShapeScreen#getHeight()</code> returns its height. You can use these values to do things like anchor a shape to the right or bottom of the screen, or to create a row or column of equal sizes shapes that span the width or height of the screen.
+        </p>
+
+
+        <h3>Modifying the Coordinate System</h3>
+
+        <p>
+          By default, the positions and sizes that you give to shapes when you create them are in pixels. If you are creating a game or physical simulation that needs real world units, however, you need to change the coordinate system to use those new units.
+        </p><p>
+          <code>ShapeScreen</code> and <code>ShapeView</code> have a method named <code class="link">sofia.app.ShapeScreen#getCoordinateSystem()</code>, which returns a <code class="link">sofia.graphics.CoordinateSystem</code> object. This object can be used to change the way shape positions and locations are interpreted. Consider the following example:
+        </p>
+<pre>
+    getCoordinateSystem().origin(Anchor.BOTTOM_LEFT).flipY().width(50);
+</pre>
+
+        <p>
+          The code above will move the origin of the screen to the lower-left corner, flip the y-axis so that it grows up instead of down, and then scales the units so that the width of the display will be 50 units across. The number of units in the vertical direction will then depend on the height of the display; by only providing one of the two values, the other will be automatically scaled so that the units remain square.
+        </p>
+
+        <h3>Mixing Shapes with Other Widgets</h3>
+
+        <p>
+          For some kinds of apps, you may not want the shape canvas to take up the entire screen, but instead combine it with other widgets or views so that you can still make use of standard buttons and text fields.
+        </p><p>
+          For performance reasons, it is highly discouraged that you try to include Android widgets directly <strong>on</strong> the shape canvas itself. Instead, you can partition your screen space so that a shape canvas occupies part of your GUI layout alongside those other widgets.
+        </p><p>
+          The easiest way to do this is still to have your screen class extend <code>ShapeScreen</code>, but then to also provide a GUI layout XML file for the screen, either by giving it the correct filename or using the <code>@ScreenLayout</code> annotation.
+        </p><p>
+          In this layout, you need to let Sofia know where the shape canvas should go. This canvas is actually represented by the <code class="link">sofia.graphics.ShapeView</code> class. This view is located in the <strong>Custom and Library Views</strong> section of the GUI palette and you can drag one of these onto your layout as you would any other widget.
+        </p><p>
+          Just placing the view on your layout isn't enough, however. Methods like <code>add()</code> from the <code>ShapeScreen</code> must still know which view actually represents the <code>ShapeView</code> that shapes should be added to. To make this connection, give the view an ID of <code>shapeView</code>, spelled exactly this way (lowercase <code>s</code>, uppercase <code>V</code>). Once this is done, the screen will find the correct view to place shapes on.
+        </p>
+        
+        <div class="alert alert-info">
+          The last paragraph above implies that a <code>ShapeScreen</code> can only manipulate one <code>ShapeView</code> at a time. You <strong>can</strong> have as many <code>ShapeView</code> objects as you want on a single screen, but only one can be manipulated using the <strong>screen's</strong> <code>add()</code>/<code>remove()</code>/<code>clear()</code> methods. However, the <code>ShapeView</code> class itself also provides these methods, so that you can manipulate other views directly if you need to.
+        </div>
+
+
+        <div class="page-header"><h2 id="touch-events">Handling Touch Events</h2></div>
+
+        <p>
+          We've already seen some examples of handling user input for the built-in Android widgets in <a href="chapter2.html">Chapter 2</a>. For example, when the user touches a button, your <code>Screen</code> receives a notification that it was clicked.
+        </p><p>
+          For buttons and other standard widgets, however, this is all the information you receive. That is, you only find out <strong>that</strong> the button was clicked, not <strong>where</strong> on the button was clicked. That's fine, though&mdash;for regular buttons, it doesn't matter whether the user tapped the left side or the right side, as long as she tapped <strong>somewhere</strong> on it.
+        </p><p>
+          If you're doing something more advanced though, like manipulating graphics on a canvas, detailed touch input data becomes more important. You probably want to know what location on the screen was tapped, what shapes were there, let the user drag shapes around, or any number of other possibilities.
+        </p><p>
+          Touch input notifications come in <strong>three phases</strong>:
+        </p>
+
+        <ol>
+          <li>A single notification when the user has <strong>touched her finger down</strong> on the screen.</li>
+          <li>Then, while holding it down, you may receive <strong>zero, one, or several</strong> notifications that the user has <strong>moved her finger</strong> on the screen.</li>
+          <li>Finally, a single notification that the user has <strong>lifted her finger up</strong> off the screen.</li>
+        </ol>
+
+        <p>
+          The fact that you receive many movement notifications is important because it allows your app to track that movement live and respond immediately. Even the slighest movement might generate a handful of events.
+        </p><p>
+          So how does your app handle these? If you've extended <code>ShapeScreen</code>, then you can implement any or all of the following three methods, depending on what kind of notifications you need to handle:
+        </p>
+
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Event Method</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="nowrap">
+                <code>onTouchDown(float x, float y)</code><br/>
+                <code>onTouchDown(MotionEvent e)</code>
+              </td>
+              <td>Called once when the user first touches her finger down on the shape canvas.</td>
+            </tr>
+            <tr>
+              <td class="nowrap">
+                <code>onTouchMove(float x, float y)</code><br/>
+                <code>onTouchMove(MotionEvent e)</code>
+              </td>
+              <td>Called many times as the user drags her finger around the shape canvas as it is held down against the screen.</td>
+            </tr>
+            <tr>
+              <td class="nowrap">
+                <code>onTouchUp(float x, float y)</code><br/>
+                <code>onTouchUp(MotionEvent e)</code>
+              </td>
+              <td>Called once when the user finally lifts her finger up off the shape canvas.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          Note that the methods above have two forms. You can write one that takes x- and y-coordinates of the touch, or you can write one that takes an Android <code class="link">android.view.MotionEvent</code> object that includes these coordinates and other information.
+        </p><p>
+          If you only need access to the location of the touch event, defining the method that takes the x- and y-coordinates directly might be easier. If you need additional information, however (such as multi-touch events), then you'll need to write one that takes the full object.
+        </p>
+
+        <div class="alert alert-info">
+          <strong>Note:</strong> The <code>onTouch*</code> methods that take x- and y-coordinates are passed those coordinates in the same coordinate system that the <code>ShapeView</code> is using, which may be different from pixel locations if you have modified the coordinate system. The methods that take <code>MotionEvent</code> objects always return <em>pixel locations on the view</em>.
+        </div>
+
+        
+        <h3>Determining Which Shape Was Touched</h3>
+
+        <p>
+          For some apps, you might only interested in the pixel location where the user touched the screen. For example, and app that lets you draw shapes would want to use that precise location to position and size the shape when the user touches and drags. In these cases, the coordinates passed to the <code>onTouch*</code> methods provide all the information you need.
+        </p><p>
+          For other apps, however, existing shapes on the screen might represent touchable objects that the app should react to in different ways when the user comes in contact with them. In this case, the pixel location of the touch event is only a tool to answer the real question you're interested in: Which shape was touched?
+        </p><p>
+          There are two main ways of getting an answer to this question, and it depends on which of the following ways is more appropriate to ask it. The first is a simple <strong>yes/no question</strong>, and the second is a <strong>search query</strong>:
+        </p>
+
+        <ol>
+          <li>You can ask a specific <code>Shape</code>, "Do you occupy a particular location on the canvas?"</li>
+          <li>You can ask the <code>ShapeScreen</code> (or the <code>ShapeView</code>), "Give me the shape&mdash;or shapes&mdash;that occupy a particular location on the canvas."</li>
+        </ol>
+
+        <p>
+          The first option is the simpler of the two and is useful if you already have a specific shape of interest and want to know if the user has touched it. To do this, you call the <code class="link">sofia.graphics.Shape#contains(float, float)</code> method on the <code>Shape</code> object and pass it the x- and y-coordinates of the location you're interested in. This method returns a <code>boolean</code> value: <code>true</code> if the point is inside the shape or <code>false</code> if it is not.
+        </p><p>
+          The second option is more useful if you have a large number of shapes on the screen and want to quickly filter the ones that the user came in contact with. <code>ShapeScreen</code> and <code>ShapeView</code> provide <strong>search filters</strong> that let you ask it for the set of shapes that meet a certain list of criteria. You start a search by calling the <code class="link">sofia.app.ShapeScreen#getShapes()</code> method on your screen or view, which returns a <code class="link">sofia.graphics.ShapeFilter</code> object that matches every shape in the view. Then, you can call methods on the <code>ShapeFilter</code> to reduce the set based on characteristics of the shapes that you want to find, and you can chain these filters together easily (an example is below).
+        </p><p>
+          Some methods that you can use to filter the shapes are:
+        </p>
+
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="nowrap"><code class="link">sofia.graphics.ShapeFilter#locatedAt(float, float)</td>
+              <td>Restricts the filter to only match shapes that occupy the specified x- and y-coordinates.</td>
+            </tr>
+            <tr>
+              <td class="nowrap"><code class="link">sofia.graphics.ShapeFilter#locatedWithin(float, float, float)</td>
+              <td>Restricts the filter to only match shapes that are within a certain radius (the third parameter) of a point.</td>
+            </tr>
+            <tr>
+              <td class="nowrap"><code class="link">sofia.graphics.ShapeFilter#intersecting(float, float, float, float)</td>
+              <td>Restricts the filter to only match shapes that intersect the rectangle with the specified left, top, right, and bottom coordinates.</td>
+            </tr>
+            <tr>
+              <td class="nowrap"><code class="link">sofia.graphics.ShapeFilter#withClass(Class)</td>
+              <td>Restricts the filter to only match shapes that are instances of the specified class (and subclasses).</td>
+            </tr>
+            <tr>
+              <td class="nowrap"><code class="link">sofia.graphics.ShapeFilter#withColor(Color)</td>
+              <td>Restricts the filter to only match shapes that are the specified color.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          There are many other filter methods than just the ones above. Once you've composed a filter, you can use it in a few different ways:
+        </p>
+
+        <ul>
+          <li>
+            Iterate over the shapes that matched the filter by using it directly in a for-each loop.
+          </li><li>
+            Get the number of shapes that matched the filter by calling <code class="link">sofia.graphics.ShapeFilter#count()</code>.
+          </li><li>
+            Get the frontmost shape that matched the filter by calling <code class="link">sofia.graphics.ShapeFilter#front()</code>, or the one furthest in the back by calling <code class="link">sofia.graphics.ShapeFilter#back()</code>.
+          </li><li>
+            Immediately remove all of the shapes that matched the filter by calling <code class="link">sofia.graphics.ShapeFilter#remove()</code>.
+          </li>          
+        </ul>
+
+        <p>
+          Some examples:
+        </p>
+
+<pre>
+    // Iterate over all of the red shapes.
+    for (Shape shape : getShapes().withColor(Color.red)) { ... }
+
+    // Remove all shapes that have gone to sleep (their motion has
+    // come to rest).
+    getShapes().withAwake(false).remove();
+
+    // Get the frontmost shape that occupies location (50, 75).
+    Shape shape = getShapes().locatedAt(50, 75).front();
+
+    // You can chain filters to combine them:
+
+    // Iterate over all of the Piggies that are awake (in motion)
+    // and are within a radius of 5 of location (20, 20). Notice
+    // that we can use Piggy as our type without casting; this is
+    // thanks to the withClass() filter, which guarantees that only
+    // Piggy objects will be returned.
+    for (Piggy piggy : getShapes().withClass(Piggy.class)
+                                  .locatedWithin(20, 20, 5))
+    {
+        ...
+    }
+</pre>
+
+
+        <div class="page-header"><h2 id="animation">Animation</h2></div>
+
+        <p>
+          In any discussion of drawing custom graphics, the question of how those graphics can be animated often comes up. Animation in the context of traditional computer graphics can be quite difficult, involving a number of advanced topics such as <strong>timers</strong> to control the frame rate, <strong>multiple threads of execution</strong> to compute those frames in the background, and <strong>synchronization</strong> to ensure that those multiple threads share a consistent view of the state of the application.
+        </p><p>
+          These concepts pose a great number of issues for even experienced programmers&mdash;let alone novices&mdash;and this makes developing apps with interesting animations a significant burden.
+        </p><p>
+          In order to address this, Sofia provides some basic but powerful animation capabilities that eliminate this burden. The API is designed in a similar fashion to animation support provided by modern web development frameworks like jQuery and Dojo.
+        </p>
+
+        
+        <h3>Animating a Shape</h3>
+
+        <img class="figure pull-right" src="img/interpolated-animation.png"/>
+        
+        <p>
+          Animations in Sofia are based on simple <span class="label label-info">interpolation</span>. This means that you only have to be concerned with the two endpoints of the animation: the starting state, which is defined as the current state of the shape (color, position, and so forth) when the animation begins, and the desired state when the animation ends. By using these two states, Sofia smoothly interpolates what the state of the shape should be at every frame of the animation.
+        </p><p>
+          Consider the example to the right. When the animation begins, the oval is filled red and positioned at the top-left corner of the view. Imagine that, in the span of one second (1000 milliseconds), you want the shape to move toward the bottom-right corner and fade to black at the same time. The right-hand side of the figure shows what five frames of the animation would look like if they were all laid on top of each other.
+        </p><p>
+          To demonstrate how easy animations are in Sofia, the above example could be achieved in just one line of code:
+        </p>
+
+<pre>
+    oval.animate(1000).position(endX, endY).color(Color.black).play();
+</pre>
+
+        <p>
+          In other words, all you have to do is tell Sofia how long you want the animation to run and what you want the shape to look like when it's over. The rest is taken care of for you!
+        </p>
+
+        <h4>A Deeper Look</h4>
+
+        <p>
+          Animations in Sofia consist of three parts:
+        </p>
+
+        <ol>
+          <li>a call to the shape's <code class="link">sofia.graphics.Shape#animate(long)</code> method, followed by</li>
+          <li>one or more chained properties that define the desired final state of the shape, and finally</li>
+          <li>a call to the <code class="link">sofia.graphics.Shape.Animator#play()</code> method to actually set the animation in motion.</li>
+        </ol>
+
+        <p>
+          Let's dissect the animation above. Assume that we have an <code>OvalShape</code> object named <code>oval</code> that is positioned at the top-left corner of the screen and filled with <code>Color.red</code>. Every shape offers an <code class="link">sofia.graphics.Shape#animate(long)</code> method that lets you define an interpolation-based animation. It takes a single parameter that indicates how long the animation should run, in milliseconds. (Using milliseconds instead of seconds gives you finer precision without worrying about rounding errors.)
+        </p><p>
+          So, in the previous example, we are saying that we want to animate our oval for 1000 milliseconds, or one second. After this, we list the properties that we want to have changed during the animation&mdash;specifically, we say what we want them to look like when it's over. In this example, we want the position of the object to change to the coordinates <code>(endX, endY)</code>, which we will assume to be variables defined elsewhere. So, we call the <code class="link">sofia.graphics.Shape.Animator#position(float, float)</code> method. We also want the color of the object to fade to black, so we call <code class="link">sofia.graphics.Shape.Animator#color(Color)</code>.
+        </p><p>
+          All this work only <strong>configures</strong> the animation&mdash;it does not start it running. To do this, we must end our animation chain with a call to the <code class="link">sofia.graphics.Shape.Animator#play()</code> method. Calling this method starts the animation in the background and <strong>returns immediately</strong>. In other words, it does not wait for the animation to complete.
+        </p>
+
+
+        <h3>When Shapes Collide</h3>
+
+        <p>
+          If your shape animations include movement, then at some point it's possible that your shapes might <strong>collide</strong> with each other while they're moving, or they might make contact with the edge of the screen. For games especially, it's important to be notified about such events so that you can execute some game logic in response to them&mdash;for example, by destroying one of the shapes that was hit, or reducing a player's health, or performing some other action.
+        </p><p>
+          Handling collisions in Sofia only requires writing one method, but there are two places where you can do it:
+        </p>
+
+        <ol>
+          <li>You can write an <code>onCollisionBetween</code> method in your <code>Screen</code> subclass that gets called when two shapes collide, or when a shape collides with the edge of the screen.</li>
+          <li>You can write an <code>onCollisionWith</code> method in a custom <code>Shape</code> subclass that gets called when that shape collides with another shape or with the edge of the screen.</li>
+        </ol>
+
+        <h4>Handling Collisions in the Screen Class</h4>
+
+        <p>
+          The first option is the only option you have if you're using the built-in shapes instead of extending them with classes of your own. In this case, you must write an <code>onCollisionBetween</code> method that takes two parameters: the two shapes involved in the collision.
+        </p><p>
+          What types should the parameters be? It depends on <strong>how broad or narrow you want your collision notifications to be.</strong> The most general option is the following:
+        </p>
+
+<pre>
+    public void onCollisionBetween(Shape first, Shape second)
+    {
+        // Do something...
+    }
+</pre>
+
+        <p>
+          This method will be called whenever <strong>any</strong> two shapes collide. But what if you're only interested in collisions between specific kinds of shapes? If your app includes ovals and rectangles flying around the screen but you're only interested in when a rectangle and an oval collide, but not when rectangles or ovals collide with themselves, you can write a method with more specific parameter types:
+        </p>
+
+<pre>
+    public void onCollisionBetween(RectangleShape first, OvalShape second)
+    {
+        // Do something...
+    }
+</pre>
+
+        <p>
+          Then, this method will <strong>only be called</strong> when a <code>RectangleShape</code> and an <code>OvalShape</code> collide. (The order of the two parameters does not matter.) Since this is an example of <span class="label label-info">method overloading</span>, it means you can have as many versions of the <code>onCollisionBetween</code> method as you want in your screen class, and only the appropriate one (or ones) will be called depending on the types of objects that collided.
+        </p>
+
+        
+        <h4>Handling Collisions in the Shapes Themselves</h4>
+
+        <p>
+          If you extend the built-in shapes to create your own custom subclasses, then you have the more convenient option of adding collision handling logic directly to the shapes themselves. This means that logic and behavior of how that collision should be handled is all neatly organized in your data model.
+        </p><p>
+          Think back to the <code>Piggy</code> class in the <em>Angry Birds</em> example from earlier. When a bird and a piggy collide, you want to call the <code>gotHit()</code> method that decreases the piggy's health and changes his appearance. This logic can be written easily using the <code>onCollisionWith</code> method. Since this method is implemented in a shape itself, it assumes that one of the shapes involved in the collision is the object that the method is called on. Then, this method only needs to take one parameter: the other shape involved in the collision.
+        </p>
+
+<pre>
+public class Piggy extends OvalShape
+{
+    // The same fields, constructors, and methods from before...
+
+    public void onCollisionWith(Bird bird)
+    {
+        gotHit();
+    }
+}
+</pre>
+
+        <p>
+          And that's it! Whenever a <code>Bird</code> collides with a <code>Piggy</code>, the method above will be called without any further intervention on your part. As with <code>onCollisionBetween</code>, you can overload <code>onCollisionWith</code> with as many different parameter types as you want in order to handle collisions between the shape class that the method is in and other kinds of shapes.
+        </p>
+
+      </div> <!-- page-content -->
+    </div> <!-- nav-and-contents -->
+  </div> <!-- page -->
+
+  <footer>
+    <div class="container">
+      <p class="pull-left">
+        &copy; 2012&ndash;2013 Tony Allevato
+      </p>
+      <p class="pull-right">
+        <a href="#">Back to top</a>
+      </p>
+    </div>
+  </footer><!-- footer -->
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+  <script src="codemirror/lib/codemirror.js" type="text/javascript"></script>
+  <script src="codemirror/mode/clike/clike.js" type="text/javascript"></script>
+  <script src="codemirror/mode/xml/xml.js" type="text/javascript"></script>
+  <script src="codemirror/lib/util/matchbrackets.js" type="text/javascript"></script>
+  <script src="js/book.js" type="text/javascript"></script>
+
+  </body>
+</html>

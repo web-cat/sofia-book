@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Introduction &ndash; Philosophia Sofia &ndash; Sofia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Tony Allevato">
+
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="codemirror/lib/codemirror.css" type="text/css"/>
+    <link rel="stylesheet" href="codemirror/theme/simple.css" type="text/css"/>
+    <link rel="stylesheet" href="css/style.css" type="text/css"/>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+  <div id="page">
+    <div id="nav-and-content">
+
+      <div id="contents">
+        <h1><a href="index.html">Sofia</a></h1>
+        <dl>
+          <dt>Introduction</dt>
+          <dd><a href="introduction.html">Philosophia Sofia</a></dd>
+
+          <dt>Chapter 1</dt>
+          <dd><a href="chapter1.html">Getting Started with Android</a></dd>
+
+          <dt>Chapter 2</dt>
+          <dd><a href="chapter2.html">Structure of an Android Application</a></dd>
+          
+          <dt>Chapter 3</dt>
+          <dd><a href="chapter3.html">Basic GUI-Driven Apps</a></dd>
+          
+          <dt>Chapter 4</dt>
+          <dd><a href="chapter4.html">Testing GUI Apps</a></dd>
+
+          <dt>Chapter 5</dt>
+          <dd><a href="chapter5.html">Advanced Graphics</a></dd>
+
+          <dt>Gallery</dt>
+          <dd><a href="gallery.html">Student Work Gallery</a></dd>
+
+          <dt>Appendix A</dt>
+          <dd><a href="http://sofia.cs.vt.edu/sofia-2114/api/reference">Sofia API</a></dd>
+
+          <dt>Appendix B</dt>
+          <dd><a href="downloads.html">Demos and Downloads</a></dd>
+        </dl>
+      </div>
+
+      <div id="page-content">
+
+        <h1>
+          <small>Introduction</small><br/>
+          Philosophia Sofia
+        </h1>
+
+        <p>
+          Below are just a few of the motivating ideas that make up the <strong>Philosophia Sofia</strong>.
+        </p>
+
+
+        <h2 class="page-header">Avoid Tradition for Tradition's Sake</h2>
+
+        <p>
+          Java is a statically-typed language, which imposes certain design patterns and conventions on the programmer. For example, sometimes polymorphism through virtual methods called on a base class reference is not enough to solve a problem; runtime type checks (<code>instanceof</code>) and clunky static downcasts are needed to get at specific data from an object returned by the system. (For example, think about retrieving a reference to a widget of a specific type by calling <code>findViewById</code>.)
+        </p><p>
+          Likewise, event handling often takes place using listener interfaces, which have their own set of limitations. Consider handling the event that is fired when an item is clicked in a <code>ListView</code>. Some object in your system must implement the <code>OnItemClickListener</code> interface. You can do this in the activity class that owns the view, but this forces you to only have one method for all list views that you might have in that activity. Named or anonymous inner classes remove this limitation, but are awkward in other ways.
+        </p><p>
+          We have chosen to free ourselves of the shackles above, eschewing tradition when it would only serve to slow down the development process or provide little value in terms of solving an actual task in the problem domain. We strive not only to provide a <strong>simpler</strong> way for students to write Android apps, but a <strong>better</strong> way. The framework should handle as much of the "glue" as possible, leaving the programmer to focus much more on the <strong>meaningful</strong> app logic.
+        </p>
+
+
+        <h2 class="page-header">Breaking Through the Ceiling</h2>
+
+        <p>
+          Many software frameworks used to teach introductory computer science courses cause students to hit a ceiling after reaching a certain degree of proficiency, at which point the framework becomes unusable. Many of these educational frameworks support a very restricted subset of functionality and applications developed with them end up looking like "toys" or otherwise fail to meet the standards of real applications on the target platform, which demotivates students.
+        </p><p>
+          These concerns were at the front of our minds when we developed Sofia. We don't want students to feel <strong>forced into</strong> the Sofia philosophy; we want them to <strong>find comfort in it</strong> and appreciate it on its own. Students who have done Android programming before using Sofia have reacted very positively about the way the framework simplifies and abstracts many of the lower-level aspects of the platform.
+        </p><p>
+          By not locking users into a particular programming model, we ensure that it is always possible to fall back to the standard Android API if Sofia doesn't support a feature that students would need. Unlike a lot of other tools and frameworks, Sofia doesn't provide a totally different or alien set of building blocks for constructing Android applications; it just provides bigger blocks. This makes it possible for Sofia to be used <strong>not only by students but by professional Android developers as well</strong>. Students will learn skills that they can build on after class, not skills that they have to unlearn or replace.
+        </p>
+
+
+        <h2 class="page-header">Convention Over Configuration</h2>
+
+        <p>
+          Here are some ways that Sofia applies convention over configuration principles to Android programming:
+        </p>
+
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th style="width: 20%">Task</th>
+              <th style="width: 40%">Using Traditional Android APIs</th>
+              <th style="width: 40%">Using Sofia</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Loading layouts</th>
+              <td>
+                Your activity must explicitly call <code>setContentView</code> to load a layout resource.
+              </td>
+              <td>
+                For subclasses of <code class="link">sofia.app.Screen</code>, the layout resource is loaded automatically based on the name of the class. For example, a class named <code>FooScreen</code> would load <code>res/layout/fooscreen.xml</code>, if found.
+              </td>
+            </tr>
+            <tr>
+              <th>Accessing widgets</th>
+              <td>
+                Your activity must explicitly call <code>findViewById</code> to look up a widget in your layout. This method returns <code>View</code>, so you must then explicitly downcast it to the actual type.
+              </td>
+              <td>
+                For subclasses of <code class="link">sofia.app.Screen</code>, private fields with names that match IDs in the auto-loaded layout will be automatically filled with references to those widgets, as long as the types are compatible.
+              </td>
+            </tr>
+            <tr>
+              <th>Handling events</th>
+              <td>
+                Your code must explicitly implement listener interfaces and then call setter methods that register the listeners with the widgets you are interested in.
+              </td>
+              <td>
+                Events are dispatched automatically to methods that are named based on the ID of the widget and the type of event you are interested in. For example, <code>myListItemClicked</code> would be called when an item is clicked in a <code>ListView</code> with the ID <code>myList</code>.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+
+        <h2 class="page-header">Use Strong Typing Intelligently</h2>
+
+        <p>
+          Imagine that you had an object-oriented graphics framework like the one in Sofia. It has a <code>Shape</code> class, which then has subclasses for specific kinds of shapes, like <code>RectangleShape</code> and <code>OvalShape</code>. Imagine further that when these shapes are on the screen, they can receive notifications when they collide with other shapes. In order to polymorphically handle collisions between <em>all</em> kinds of shapes, a traditional Java library might have the user override a method like this in their <code>Shape</code> subclass:
+        </p>
+        <pre>
+public void onCollisionWith(Shape otherShape)
+{
+    // ...
+}
+        </pre>
+        <p>
+          But we're not done yet. At this point, we don't know what type of shape the other one actually is. If we're writing a game, we certainly want to know this; collisions between friendly characters would be handled different than collisions between a friendly character and a monster. This means we need to do runtime type checks by hand:
+        </p>
+        <pre>
+public void onCollisionWith(Shape otherShape)
+{
+    if (otherShape instanceof GoodGuy)
+    {
+        GoodGuy goodGuy = (GoodGuy) otherShape;
+        // Do something with goodGuy...
+    }
+    else if (otherShape instanceof BadGuy)
+    {
+        BadGuy badGuy = (BadGuy) otherShape;
+        // Do something with badGuy...
+    }
+}
+        </pre>
+        <p>
+          This kind of boilerplate code doesn't contribute much real value to the solution; in fact, it detracts from the legibility of the solution. Wouldn't it be nice if you could just say what you meant in the first place, like this?
+        </p>
+        <pre>
+public void onCollisionWith(GoodGuy goodGuy)
+{
+    // Do something with goodGuy...
+}
+
+public void onCollisionWith(BadGuy badGuy)
+{
+    // Do something with badGuy...
+}
+        </pre>
+        <p>
+          Sofia lets you do exactly this! Polymorphism in Java is "single dispatch", meaning that only the type of the object receiving the method call is considered when determining which implementation of the method to call at runtime. The actual types of the objects passed to the method are not considered.
+        </p><p>
+          For its internal event dispatch mechanism, Sofia considers the argument types as well. Using reflection, it looks up methods based on the <em>actual</em> types of the arguments, not the compile-time types of the reference. This achieves "multiple dispatch" for these methods, allowing the programmer to focus on their design and letting the framework manage the boilerplate glue.
+        </p>
+
+      </div> <!-- page-content -->
+    </div> <!-- nav-and-contents -->
+  </div> <!-- page -->
+
+  <footer>
+    <div class="container">
+      <p class="pull-left">
+        &copy; 2012&ndash;2013 Tony Allevato
+      </p>
+      <p class="pull-right">
+        <a href="#">Back to top</a>
+      </p>
+    </div>
+  </footer><!-- footer -->
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+  <script src="codemirror/lib/codemirror.js" type="text/javascript"></script>
+  <script src="codemirror/mode/clike/clike.js" type="text/javascript"></script>
+  <script src="codemirror/mode/xml/xml.js" type="text/javascript"></script>
+  <script src="codemirror/lib/util/matchbrackets.js" type="text/javascript"></script>
+  <script src="js/book.js" type="text/javascript"></script>
+
+  </body>
+</html>
